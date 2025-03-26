@@ -7,10 +7,19 @@ const api = axios.create({
 
 // Request interceptor
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const userInfoString = localStorage.getItem('userInfo');
+  
+  if (userInfoString) {
+    try {
+      const userInfo = JSON.parse(userInfoString);
+      if (userInfo && userInfo.token) {
+        config.headers.Authorization = `Bearer ${userInfo.token}`;
+      }
+    } catch (error) {
+      console.error('Error parsing userInfo from localStorage:', error);
+    }
   }
+  
   return config;
 });
 

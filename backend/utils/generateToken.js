@@ -11,7 +11,8 @@ const generateToken = (res, userId) => {
     secure: false, // localhost uchun false qilish kerak
     sameSite: "lax", // strict o'rniga lax
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 kun
-    domain: "localhost" // maxsus domain belgilash
+    domain: undefined, // maxsus domain belgilash
+    path: "/",
   });
 
   return token;
