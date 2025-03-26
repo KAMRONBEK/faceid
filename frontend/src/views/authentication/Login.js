@@ -46,6 +46,7 @@ const Login = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
   useEffect(() => {
+    console.log('userInfo changed:', userInfo);
     if (userInfo) {
       navigate('/');
     }
@@ -54,7 +55,7 @@ const Login = () => {
   const handleSubmit = async ({ email, password }) => {
     try {
       const res = await login({ email, password }).unwrap();
-
+      console.log('Login response:', res);
       dispatch(setCredentials({ ...res }));
       formik.resetForm();
 
