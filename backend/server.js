@@ -35,22 +35,30 @@ app.use('/api/users', userRoutes);
 app.use('/api/exams', examRoutes);
 
 // Production setup
-if (process.env.NODE_ENV === "production") {
-  const __dirname = path.resolve();
-  app.use(express.static(path.join(__dirname, "/frontend/dist")));
-  app.get("*", (req, res) =>
-    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
-  );
-} else {
-  app.get("/", (req, res) => res.send("Server is running"));
-}
+// if (process.env.NODE_ENV === "production") {
+//   const __dirname = path.resolve();
+//   app.use(express.static(path.join(__dirname, "/frontend/dist")));
+//   app.get("*", (req, res) =>
+//     res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
+//   );
+// } else {
+//   app.get("/", (req, res) => res.send("Server is running"));
+// }
+app.get("/", (req, res) => res.send("Backend API is running"));
+
 
 // Error handling
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(port, () => 
-  console.log(`Server running on http://localhost:${port}`)
-);
+// app.listen(port, () => 
+//   console.log(`Server running on http://localhost:${port}`)
+// );
+
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => 
+    console.log(`Server running on http://localhost:${port}`)
+  );
+}
 
 export default app;
