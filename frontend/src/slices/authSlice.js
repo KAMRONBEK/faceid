@@ -12,6 +12,7 @@ const authSlice = createSlice({
     // set  userinfo in local storage
     setCredentials: (state, action) => {
       state.userInfo = action.payload;
+      console.log("Setting credentials with payload:", action.payload);
       localStorage.setItem('userInfo', JSON.stringify(action.payload));
     },
     // clear local storage it different from actual logout which send to backend
