@@ -56,16 +56,23 @@ const Login = () => {
     try {
       const res = await login({ email, password }).unwrap();
       console.log('Login response:', res);
-      dispatch(setCredentials({ ...res }));
+      
+      // First set the credentials
+      await dispatch(setCredentials({ ...res })).unwrap();
+      
+      // Reset form
       formik.resetForm();
 
-      const redirectLocation = JSON.parse(localStorage.getItem('redirectLocation'));
-      if (redirectLocation) {
-        localStorage.removeItem('redirectLocation');
-        navigate(redirectLocation.pathname);
-      } else {
-        navigate('/');
-      }
+      // Wait a small delay to ensure state is updated
+      setTimeout(() => {
+        const redirectLocation = JSON.parse(localStorage.getItem('redirectLocation'));
+        if (redirectLocation) {
+          localStorage.removeItem('redirectLocation');
+          navigate(redirectLocation.pathname);
+        } else {
+          navigate('/');
+        }
+      }, 100);
     } catch (err) {
       toast.error(err?.data?.message || err.error);
     }

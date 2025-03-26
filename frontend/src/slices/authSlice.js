@@ -13,7 +13,12 @@ const authSlice = createSlice({
     setCredentials: (state, action) => {
       state.userInfo = action.payload;
       console.log("Setting credentials with payload:", action.payload);
-      localStorage.setItem('userInfo', JSON.stringify(action.payload));
+      // Ensure localStorage is updated synchronously
+      try {
+        localStorage.setItem('userInfo', JSON.stringify(action.payload));
+      } catch (error) {
+        console.error('Error setting userInfo in localStorage:', error);
+      }
     },
     // clear local storage it different from actual logout which send to backend
     // it just clear credential form local storage it like frontend logout
