@@ -48,6 +48,7 @@
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
     "@babel/preset-env": "7.22.5",
     "@craco/craco": "^7.1.0",
+    "env-cmd": "^10.1.0",
     "eslint": "8.42.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-prettier": "8.8.0",
@@ -63,6 +64,8 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
+    "build:staging": "env-cmd -f .env.staging craco build",
+    "build:production": "env-cmd -f .env.production craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },

@@ -1,7 +1,7 @@
 import { fetchBaseQuery, createApi } from '@reduxjs/toolkit/query/react';
 
 const baseQuery = fetchBaseQuery({ 
-  baseUrl: 'http://localhost:5005',
+  baseUrl: process.env.REACT_APP_API_BASE_URL,
   credentials: 'include', // withCredentials o'rniga
   prepareHeaders: (headers, { getState }) => {
     // Tokenni console'ga chiqaramiz
