@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // Single Page Apps for GitHub Pages or any static hosting
+    // This script takes the current URL and converts the path and query
+    // string into just a query string, and then redirects the browser
+    // to the new URL with only a query string and hash fragment.
+    
+    // If you're creating a Project Pages site and NOT using a custom domain,
+    // then set pathSegmentsToKeep to 1 (enterprise users may need to set it to > 1).
+    var pathSegmentsToKeep = 0;
+
+    var l = window.location;
+    var redirectLocation = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '');
+    var path = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/';
+    redirectLocation += path + '?p=' + encodeURIComponent(l.pathname.slice(path.length)) + l.search;
+    
+    if (l.pathname.includes('/auth/') || l.pathname.includes('/dashboard') || l.pathname.includes('/exam')) {
+      // Store the intended location if it's a protected route
+      localStorage.setItem('redirectLocation', JSON.stringify({
+        pathname: l.pathname,
+        search: l.search,
+        hash: l.hash
+      }));
+    }
+
+    window.location.replace(redirectLocation);
+  </script>
+</head>
+<body>
+  <h1>Redirecting...</h1>
+  <p>If you are not redirected automatically, follow this <a href="/">link</a>.</p>
+</body>
+</html>

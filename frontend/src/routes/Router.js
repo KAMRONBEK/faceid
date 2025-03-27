@@ -35,6 +35,9 @@ const AddQuestions = Loadable(lazy(() => import('./../views/teacher/AddQuestions
 const PrivateRoute = Loadable(lazy(() => import('src/views/authentication/PrivateRoute')));
 const TeacherRoute = Loadable(lazy(() => import('src/views/authentication/TeacherRoute')));
 
+// Public URL path from environment or empty string
+const publicUrl = process.env.PUBLIC_URL || '';
+
 const Router = createBrowserRouter(
   createRoutesFromElements(
     // Every router we create will now go in here as
@@ -80,6 +83,7 @@ const Router = createBrowserRouter(
       </Route>
     </>,
   ),
+  { basename: publicUrl } // Add basename configuration
 );
 
 export default Router;
