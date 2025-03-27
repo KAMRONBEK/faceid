@@ -2,6 +2,7 @@ import React, { lazy } from 'react';
 import { Navigate, Route, createBrowserRouter, createRoutesFromElements } from 'react-router-dom';
 import Loadable from '../layouts/full/shared/loadable/Loadable';
 import { useSelector } from 'react-redux';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 /* ***Layouts**** */
 const BlankLayout = Loadable(lazy(() => import('../layouts/blank/BlankLayout')));
@@ -70,7 +71,11 @@ const Router = createBrowserRouter(
       <Route path="/auth" element={<BlankLayout />}>
         <Route path="404" element={<Error />} />
         <Route path="/auth/register" element={<Register />} />
-        <Route path="/auth/login" element={<Login />} />
+        <Route path="/auth/login" element={
+          <ErrorBoundary showDetails={process.env.NODE_ENV !== 'production'}>
+            <Login />
+          </ErrorBoundary>
+        } />
         {/* <Route path="*" element={<Navigate to="/auth/404" />} /> */}
       </Route>
     </>,

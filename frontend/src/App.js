@@ -4,6 +4,7 @@ import { baselightTheme } from './theme/DefaultColors';
 // Router Provider
 import { RouterProvider, useRoutes } from 'react-router-dom';
 import Router from './routes/Router';
+import { Suspense } from 'react';
 
 // Redux Provider
 import { Provider } from 'react-redux';
@@ -20,8 +21,9 @@ function App() {
       <Provider store={store}>
         <ToastContainer />
         <CssBaseline />
-        {/* {routing} */}
-        <RouterProvider router={Router} />
+        <Suspense fallback={<div className="loading-screen">Loading...</div>}>
+          <RouterProvider router={Router} />
+        </Suspense>
       </Provider>
     </ThemeProvider>
   );
