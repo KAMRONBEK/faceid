@@ -2,7 +2,7 @@ import React, { lazy } from 'react';
 import { Navigate, Route, createBrowserRouter, createRoutesFromElements } from 'react-router-dom';
 import Loadable from '../layouts/full/shared/loadable/Loadable';
 import { useSelector } from 'react-redux';
-import ErrorBoundary from '../components/ErrorBoundary';
+import ErrorBoundary from '../components/container/ErrorBoundary';
 
 /* ***Layouts**** */
 const BlankLayout = Loadable(lazy(() => import('../layouts/blank/BlankLayout')));
