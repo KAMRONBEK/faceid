@@ -16,10 +16,10 @@ import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import { uniqueId } from 'lodash';
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useGetQuestionsQuery } from 'src/slices/examApiSlice';
+import { useGetQuestionsQuery, useGetExamsQuery } from 'src/slices/examApiSlice';
 
 function Copyright(props) {
   return (
@@ -38,8 +38,37 @@ const DescriptionAndInstructions = () => {
   const navigate = useNavigate();
 
   const { examId } = useParams();
-  const { data: questions, isLoading } = useGetQuestionsQuery(examId); // Fetch questions using examId
-  // const { data: questions, isLoading } = useGetQuestionsQuery({ examId });
+  const { data: questions, isLoading, error } = useGetQuestionsQuery(examId); // Fetch questions using examId
+  const { data: exams } = useGetExamsQuery(); // Fetch all exams to get exam details
+  
+  // State to store the current exam
+  const [currentExam, setCurrentExam] = useState(null);
+
+  // Find the exam using only the examId field, not the MongoDB _id
+  useEffect(() => {
+    console.log("ExamDetails - examId from URL:", examId);
+    
+    if (exams) {
+      // Find exam by examId field only, no longer checking _id
+      const matchedExam = exams.find(exam => exam.examId === examId);
+      console.log("ExamDetails - matched exam by examId:", matchedExam);
+      
+      // If not found by examId, look for it by _id as fallback
+      if (!matchedExam) {
+        const fallbackExam = exams.find(exam => exam._id === examId);
+        console.log("ExamDetails - fallback match by _id:", fallbackExam);
+        
+        if (fallbackExam) {
+          console.log("Exam found by _id. Consider updating URL to use examId for consistency");
+          setCurrentExam(fallbackExam);
+        } else {
+          console.error("No exam found with given ID");
+        }
+      } else {
+        setCurrentExam(matchedExam);
+      }
+    }
+  }, [examId, exams]);
 
   // fech exam data from backend
   // pass testUnique id on start button
@@ -50,16 +79,16 @@ const DescriptionAndInstructions = () => {
     setCertify(!certify);
   };
   const handleTest = () => {
-    // Check if the test date is valid here
-    const isValid = true; // Replace with your date validation logic
-    console.log('Test link');
-    if (isValid) {
-      // Replace 'examid' and 'TestId' with the actual values
-      navigate(`/exam/${examId}/${testId}`);
-    } else {
-      // Display an error message or handle invalid date
-      toast.error('Test date is not valid.');
+    // Check if we have a valid exam
+    if (!currentExam) {
+      toast.error('Exam not found or no longer available');
+      return;
     }
+    
+    // Consistently use examId from the exam object
+    const targetExamId = currentExam.examId;
+    console.log('Starting test with examId:', targetExamId, 'and testId:', testId);
+    navigate(`/exam/${targetExamId}/${testId}`);
   };
 
   return (

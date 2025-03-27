@@ -16,7 +16,7 @@ import {
 import { useGetExamsQuery } from 'src/slices/examApiSlice';
 import { useGetCheatingLogsQuery } from 'src/slices/cheatingLogApiSlice';
 
-export default function CheatingTable() {
+export default function CheatingTable({ onExamSelect }) {
   const [filter, setFilter] = useState('');
   const [selectedExamId, setSelectedExamId] = useState('');
   const [cheatingLogs, setCheatingLogs] = useState([]);
@@ -27,14 +27,21 @@ export default function CheatingTable() {
   useEffect(() => {
     if (examsData && examsData.length > 0) {
       setSelectedExamId(examsData[0].examId);
+      onExamSelect?.(examsData[0].examId);
     }
-  }, [examsData]);
+  }, [examsData, onExamSelect]);
 
   useEffect(() => {
     if (cheatingLogsData) {
       setCheatingLogs(cheatingLogsData);
     }
   }, [cheatingLogsData]);
+
+  const handleExamChange = (e) => {
+    const newExamId = e.target.value;
+    setSelectedExamId(newExamId);
+    onExamSelect?.(newExamId);
+  };
 
   const filteredUsers = cheatingLogs.filter(
     (log) =>
@@ -47,9 +54,7 @@ export default function CheatingTable() {
       <Select
         label="Select Exam"
         value={selectedExamId}
-        onChange={(e) => {
-          setSelectedExamId(e.target.value);
-        }}
+        onChange={handleExamChange}
         fullWidth
         sx={{ mb: 2 }}
       >

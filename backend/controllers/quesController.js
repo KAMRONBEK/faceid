@@ -9,8 +9,17 @@ const getQuestionsByExamId = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: "examId is missing or invalid" });
   }
 
+  // We only use the examId field (UUID) for querying - no ambiguous checks
   const questions = await Question.find({ examId });
-  console.log("Question Exam  ", questions);
+  console.log(`Found ${questions.length} questions for exam ID ${examId}`);
+  
+  if (questions.length === 0) {
+    console.log("No questions found for exam ID:", examId);
+    return res.status(404).json({ 
+      message: "No questions found for this exam", 
+      examId 
+    });
+  }
 
   res.status(200).json(questions);
 });

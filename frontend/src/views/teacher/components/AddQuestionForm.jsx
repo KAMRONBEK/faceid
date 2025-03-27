@@ -31,14 +31,30 @@ const AddQuestionForm = () => {
 
   useEffect(() => {
     if (examsData && examsData.length > 0) {
-      setSelectedExamId(examsData[0].examId);
-      console.log(examsData[0].examId, 'examsData[0].examId');
+      const firstExam = examsData[0];
+      if (firstExam.examId) {
+        setSelectedExamId(firstExam.examId);
+        console.log("Using examId for question creation:", firstExam.examId);
+      } else {
+        console.error("Exam is missing examId field:", firstExam);
+        toast.error("Error with exam data structure");
+      }
     }
   }, [examsData]);
 
   const handleAddQuestion = async () => {
     if (newQuestion.trim() === '' || newOptions.some((option) => option.trim() === '')) {
       swal('', 'Please fill out the question and all options.', 'error');
+      return;
+    }
+
+    if (!selectedExamId) {
+      toast.error("No exam selected. Please select an exam first.");
+      return;
+    }
+
+    if (!correctOptions.some(isCorrect => isCorrect)) {
+      toast.error("Please mark at least one option as correct");
       return;
     }
 
@@ -51,16 +67,21 @@ const AddQuestionForm = () => {
       examId: selectedExamId,
     };
 
+    console.log("Creating question with examId:", selectedExamId);
+
     try {
       const res = await createQuestion(newQuestionObj).unwrap();
       if (res) {
         toast.success('Question added successfully!!!');
+        console.log("Created question:", res);
       }
       setQuestions([...questions, res]);
       setNewQuestion('');
       setNewOptions(['', '', '', '']);
       setCorrectOptions([false, false, false, false]);
     } catch (err) {
+      console.error("Error creating question:", err);
+      toast.error(err?.data?.message || 'Failed to create question');
       swal('', 'Failed to create question. Please try again.', 'error');
     }
   };
@@ -78,15 +99,16 @@ const AddQuestionForm = () => {
         label="Select Exam"
         value={selectedExamId}
         onChange={(e) => {
-          console.log(e.target.value, 'option ID');
-          setSelectedExamId(e.target.value);
+          const newExamId = e.target.value;
+          console.log("Selected exam ID:", newExamId);
+          setSelectedExamId(newExamId);
         }}
         fullWidth
         sx={{ mb: 2 }}
       >
         {examsData &&
           examsData.map((exam) => (
-            <MenuItem key={exam.examId} value={exam.examId}>
+            <MenuItem key={exam.examId || exam._id} value={exam.examId}>
               {exam.examName}
             </MenuItem>
           ))}

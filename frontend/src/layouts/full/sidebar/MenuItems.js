@@ -7,6 +7,7 @@ import {
   IconTypography,
   IconUserPlus,
   IconPlayerPlayFilled,
+  IconClipboardList,
 } from '@tabler/icons-react';
 
 import { uniqueId } from 'lodash';
@@ -35,8 +36,8 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: 'Result',
-    icon: IconCopy,
+    title: 'Results',
+    icon: IconClipboardList,
     href: '/result',
   },
   {

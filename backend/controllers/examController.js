@@ -1,12 +1,25 @@
 import asyncHandler from "express-async-handler";
 import Exam from "./../models/examModel.js";
 
-// @desc Get all exams
+// @desc Get exams based on user role
 // @route GET /api/exams
-// @access Public
+// @access Private
 const getExams = asyncHandler(async (req, res) => {
-  const exams = await Exam.find();
-  res.status(200).json(exams);
+  const { role } = req.user;
+
+  // Handle both teacher and student cases in the controller
+  if (role === 'teacher') {
+    const exams = await Exam.find();
+    return res.status(200).json(exams);
+  } else {
+    // For students, only show active exams
+    const currentDate = new Date();
+    const exams = await Exam.find({
+      liveDate: { $lte: currentDate },
+      deadDate: { $gte: currentDate }
+    });
+    return res.status(200).json(exams);
+  }
 });
 
 // @desc Create a new exam

@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
 import examRoutes from "./routes/examRoutes.js";
+import resultRoutes from "./routes/resultRoutes.js";
 import cors from "cors";
 
 dotenv.config();
@@ -33,6 +34,7 @@ app.use(cookieParser());
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/exams', examRoutes);
+app.use('/api/results', resultRoutes);
 
 // Production setup
 // if (process.env.NODE_ENV === "production") {

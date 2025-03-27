@@ -1,6 +1,6 @@
 import express from "express";
 
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, teacher } from "../middleware/authMiddleware.js";
 import { createExam, getExams } from "../controllers/examController.js";
 import {
   createQuestion,
@@ -13,7 +13,7 @@ import {
 const examRoutes = express.Router();
 
 // protecting Exam route using auth middleware protect /api/users/
-examRoutes.route("/exam").get(protect, getExams).post(protect, createExam);
+examRoutes.route("/").get(protect, getExams).post(protect, createExam);
 examRoutes.route("/exam/questions").post(protect, createQuestion);
 examRoutes.route("/exam/questions/:examId").get(protect, getQuestionsByExamId);
 examRoutes.route("/cheatingLogs/:examId").get(protect, getCheatingLogsByExamId);
