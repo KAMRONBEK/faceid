@@ -11,9 +11,9 @@ import * as yup from 'yup';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { useLoginMutation } from './../../slices/usersApiSlice';
+import { useLoginMutation } from '../../slices/usersApiSlice';
 
-import { setCredentials } from './../../slices/authSlice';
+import { setCredentials } from '../../slices/authSlice';
 import { toast } from 'react-toastify';
 import Loader from './Loader';
 
