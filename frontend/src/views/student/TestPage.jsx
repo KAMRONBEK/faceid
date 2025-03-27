@@ -31,6 +31,33 @@ const TestPage = () => {
   const [submitResult] = useSubmitResultMutation();
   const { userInfo } = useSelector((state) => state.auth);
 
+  // Track tab changes as cheating
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // User switched to another tab or minimized the window
+        const tabChangeLog = {
+          type: 'tab_change',
+          timestamp: new Date().toISOString(),
+          count: 1
+        };
+        setCheatingLog(prevLogs => [...prevLogs, tabChangeLog]);
+        toast.error('Leaving the test window has been recorded as a cheating attempt', {
+          position: 'top-center',
+          autoClose: 3000
+        });
+      }
+    };
+
+    // Add event listener for visibility change
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   useEffect(() => {
     if (userExamdata) {
       console.log("Available exams:", userExamdata);
@@ -93,6 +120,37 @@ const TestPage = () => {
       const endTime = new Date();
       const timeTaken = Math.floor((endTime - startTime) / 1000);
 
+      // Format cheating logs to ensure they match the backend model
+      const formattedCheatingLog = cheatingLog.map(log => {
+        const validTypes = ['cell_phone', 'book', 'no_face', 'multiple_faces', 'tab_change', 'other'];
+        let type = log.type;
+        
+        // Handle any potential mappings that may still need to be done
+        if (!validTypes.includes(type)) {
+          // Convert any non-standard types to the backend expected format
+          if (type === 'cellPhoneCount' || type === 'cell phone') {
+            type = 'cell_phone';
+          } else if (type === 'ProhibitedObjectCount') {
+            type = 'book';
+          } else if (type === 'noFaceCount') {
+            type = 'no_face';
+          } else if (type === 'multipleFaceCount') {
+            type = 'multiple_faces';
+          } else {
+            type = 'other'; // Default to 'other' if type is not recognized
+          }
+        }
+
+        // Ensure valid structure for backend
+        return {
+          type: type,
+          timestamp: log.timestamp || new Date().toISOString()
+        };
+      });
+
+      // Log the cheating attempts for debugging
+      console.log('Submitting cheating log:', formattedCheatingLog);
+
       const resultData = {
         examId,
         score,
@@ -105,8 +163,12 @@ const TestPage = () => {
           selectedOption: answer.selectedAnswer,
           isCorrect: answer.isCorrect
         })),
-        cheatingLog
+        cheatingLog: formattedCheatingLog,
+        cheatingAttempts: formattedCheatingLog.length // Add the count of cheating attempts
       };
+
+      // Log the entire result data for debugging
+      console.log('Submitting result data:', resultData);
 
       await submitResult(resultData).unwrap();
       toast.success('Exam submitted successfully!');

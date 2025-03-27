@@ -19,7 +19,8 @@ const port = process.env.PORT || 5005;
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://faceid-gold.vercel.app'
+    'https://faceid-gold.vercel.app',
+    "*"
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],

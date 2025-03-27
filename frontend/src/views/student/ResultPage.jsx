@@ -279,95 +279,89 @@ const ResultPage = () => {
               <ListItem>
                 <ListItemText
                   primary="Cheating Attempts"
-                  secondary={
-                    selectedResult.cheatingAttempts > 0 ? (
-                      <Box sx={{ mt: 1 }}>
-                        <Typography color="error.main" sx={{ fontWeight: 'bold' }}>
-                          Detected: {selectedResult.cheatingAttempts} total attempt(s)
-                        </Typography>
-                        
-                        {selectedResult.cheatingLog && selectedResult.cheatingLog.length > 0 && (
-                          <Box sx={{ mt: 1 }}>
-                            <Typography variant="subtitle2">Types of cheating detected:</Typography>
-                            <List dense disablePadding>
-                              {/* Count each type of cheating */}
-                              {(() => {
-                                const counts = {};
-                                
-                                // Count occurrences of each type
-                                selectedResult.cheatingLog.forEach(log => {
-                                  counts[log.type] = (counts[log.type] || 0) + 1;
-                                });
-                                
-                                // Display each type with count
-                                return Object.entries(counts).map(([type, count]) => {
-                                  let typeName = "Unknown";
-                                  
-                                  // Map type to readable name
-                                  switch(type) {
-                                    case 'cell_phone':
-                                      typeName = "Used phone";
-                                      break;
-                                    case 'book':
-                                      typeName = "Used prohibited materials";
-                                      break;
-                                    case 'no_face':
-                                      typeName = "Face not visible";
-                                      break;
-                                    case 'multiple_faces':
-                                      typeName = "Multiple people detected";
-                                      break;
-                                    case 'tab_change':
-                                      typeName = "Left exam window";
-                                      break;
-                                    default:
-                                      typeName = type; // Use the type code if unknown
-                                  }
-                                  
-                                  return (
-                                    <ListItem key={type} dense sx={{ py: 0.5 }}>
-                                      <Typography variant="body2" color="error.main">
-                                        • {typeName}: <strong>{count} time(s)</strong>
-                                      </Typography>
-                                    </ListItem>
-                                  );
-                                });
-                              })()}
-                            </List>
-                          </Box>
-                        )}
-                        
-                        {(!selectedResult.cheatingLog || selectedResult.cheatingLog.length === 0) && (
-                          <Typography variant="body2" sx={{ mt: 1 }}>
-                            Cheating detected but no detailed information available.
-                          </Typography>
-                        )}
-                      </Box>
-                    ) : (
-                      <Typography color="success.main">
-                        No cheating detected
-                      </Typography>
-                    )
-                  }
                 />
+                {selectedResult.cheatingAttempts > 0 ? (
+                  <Box sx={{ mt: 1 }}>
+                    <Typography color="error.main" sx={{ fontWeight: 'bold' }}>
+                      Detected: {selectedResult.cheatingAttempts} total attempt(s)
+                    </Typography>
+                    
+                    {selectedResult.cheatingLog && selectedResult.cheatingLog.length > 0 && (
+                      <Box sx={{ mt: 1 }}>
+                        <Typography variant="subtitle2">Types of cheating detected:</Typography>
+                        <Box>
+                          {/* Count each type of cheating */}
+                          {(() => {
+                            const counts = {};
+                            
+                            // Count occurrences of each type
+                            selectedResult.cheatingLog.forEach(log => {
+                              counts[log.type] = (counts[log.type] || 0) + 1;
+                            });
+                            
+                            // Display each type with count
+                            return Object.entries(counts).map(([type, count]) => {
+                              let typeName = "Unknown";
+                              
+                              // Map type to readable name
+                              switch(type) {
+                                case 'cell_phone':
+                                  typeName = "Used phone";
+                                  break;
+                                case 'book':
+                                  typeName = "Used prohibited materials";
+                                  break;
+                                case 'no_face':
+                                  typeName = "Face not visible";
+                                  break;
+                                case 'multiple_faces':
+                                  typeName = "Multiple people detected";
+                                  break;
+                                case 'tab_change':
+                                  typeName = "Left exam window";
+                                  break;
+                                default:
+                                  typeName = type; // Use the type code if unknown
+                              }
+                              
+                              return (
+                                <Box key={type} sx={{ py: 0.5 }}>
+                                  <Typography variant="body2" color="error.main">
+                                    • {typeName}: <strong>{count} time(s)</strong>
+                                  </Typography>
+                                </Box>
+                              );
+                            });
+                          })()}
+                        </Box>
+                      </Box>
+                    )}
+                    
+                    {(!selectedResult.cheatingLog || selectedResult.cheatingLog.length === 0) && (
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        Cheating detected but no detailed information available.
+                      </Typography>
+                    )}
+                  </Box>
+                ) : (
+                  <Typography color="success.main">
+                    No cheating detected
+                  </Typography>
+                )}
               </ListItem>
               <Divider />
               <ListItem>
-                <ListItemText
-                  primary="Answers"
-                  secondary={
-                    <List>
-                      {selectedResult.answers.map((answer, index) => (
-                        <ListItem key={index}>
-                          <ListItemText
-                            primary={`Question ${index + 1}`}
-                            secondary={`Selected: ${answer.selectedOption} (${answer.isCorrect ? 'Correct' : 'Incorrect'})`}
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
-                  }
-                />
+                <ListItemText primary="Answers" />
+                <Box sx={{ width: '100%' }}>
+                  {selectedResult.answers.map((answer, index) => (
+                    <Box key={index} sx={{ mb: 1 }}>
+                      <Typography variant="subtitle2">Question {index + 1}</Typography>
+                      <Typography variant="body2">
+                        Selected: {answer.selectedOption} ({answer.isCorrect ? 'Correct' : 'Incorrect'})
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
               </ListItem>
             </List>
           )}

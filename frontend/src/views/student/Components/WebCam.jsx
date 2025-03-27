@@ -7,9 +7,50 @@ import { drawRect } from './utilities';
 import { Box, Card } from '@mui/material';
 import swal from 'sweetalert';
 
-export default function Home({ cheatingLog, updateCheatingLog }) {
+export default function Home({ onCheatingDetected }) {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+  const [localCheatingLog, setLocalCheatingLog] = useState({
+    noFaceCount: 0,
+    cellPhoneCount: 0,
+    ProhibitedObjectCount: 0,
+    multipleFaceCount: 0
+  });
+
+  // Function to update cheating log locally and also notify parent
+  const updateCheatingLog = (updateFn) => {
+    setLocalCheatingLog(prevLog => {
+      const newLog = updateFn(prevLog);
+      
+      // Determine what type of cheating was detected
+      const changedProperty = Object.keys(newLog).find(key => newLog[key] > prevLog[key]) || 'unknown';
+      
+      // Map to backend expected types
+      let mappedType = 'other';
+      if (changedProperty === 'cellPhoneCount') {
+        mappedType = 'cell_phone';
+      } else if (changedProperty === 'ProhibitedObjectCount') {
+        mappedType = 'book';
+      } else if (changedProperty === 'noFaceCount') {
+        mappedType = 'no_face';
+      } else if (changedProperty === 'multipleFaceCount') {
+        mappedType = 'multiple_faces';
+      }
+      
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        type: mappedType,
+        count: newLog[changedProperty] || 0
+      };
+      
+      // Notify parent component about the cheating event
+      if (onCheatingDetected) {
+        onCheatingDetected(logEntry);
+      }
+      
+      return newLog;
+    });
+  };
 
   const runCoco = async () => {
     const net = await cocossd.load();
@@ -42,6 +83,16 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
 
       let person_count = 0;
       if (obj.length < 1) {
+        // Directly notify parent with the correct type
+        if (onCheatingDetected) {
+          onCheatingDetected({
+            timestamp: new Date().toISOString(),
+            type: 'no_face',
+            count: 1
+          });
+        }
+        
+        // Also update local state
         updateCheatingLog((prevLog) => ({
           ...prevLog,
           noFaceCount: prevLog.noFaceCount + 1,
@@ -50,6 +101,16 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
       }
       obj.forEach((element) => {
         if (element.class === 'cell phone') {
+          // Directly notify parent with the correct type
+          if (onCheatingDetected) {
+            onCheatingDetected({
+              timestamp: new Date().toISOString(),
+              type: 'cell_phone',
+              count: 1
+            });
+          }
+          
+          // Also update local state
           updateCheatingLog((prevLog) => ({
             ...prevLog,
             cellPhoneCount: prevLog.cellPhoneCount + 1,
@@ -57,6 +118,16 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
           swal('Cell Phone Detected', 'Action has been Recorded', 'error');
         }
         if (element.class === 'book') {
+          // Directly notify parent with the correct type
+          if (onCheatingDetected) {
+            onCheatingDetected({
+              timestamp: new Date().toISOString(),
+              type: 'book',
+              count: 1
+            });
+          }
+          
+          // Also update local state
           updateCheatingLog((prevLog) => ({
             ...prevLog,
             ProhibitedObjectCount: prevLog.ProhibitedObjectCount + 1,
@@ -70,6 +141,16 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
         if (element.class === 'person') {
           person_count++;
           if (person_count > 1) {
+            // Directly notify parent with the correct type
+            if (onCheatingDetected) {
+              onCheatingDetected({
+                timestamp: new Date().toISOString(),
+                type: 'multiple_faces',
+                count: 1
+              });
+            }
+            
+            // Also update local state
             updateCheatingLog((prevLog) => ({
               ...prevLog,
               multipleFaceCount: prevLog.multipleFaceCount + 1,

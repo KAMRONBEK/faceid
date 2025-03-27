@@ -14,8 +14,11 @@ const submitResult = asyncHandler(async (req, res) => {
     startTime,
     endTime,
     status,
-    cheatingAttempts
+    cheatingAttempts,
+    cheatingLog
   } = req.body;
+
+  console.log('Received cheating log:', cheatingLog);
 
   // Get exam details
   const exam = await Exam.findOne({ examId: examId });
@@ -36,7 +39,17 @@ const submitResult = asyncHandler(async (req, res) => {
     }
   }
 
-  // Create result
+  // Process cheating log to ensure it matches the schema
+  const validCheatingLog = Array.isArray(cheatingLog) ? cheatingLog.map(log => {
+    // Ensure each log entry has a valid type and timestamp
+    const validTypes = ['cell_phone', 'book', 'no_face', 'multiple_faces', 'tab_change', 'other'];
+    return {
+      type: validTypes.includes(log.type) ? log.type : 'other',
+      timestamp: log.timestamp || new Date().toISOString()
+    };
+  }) : [];
+
+  // Create result with cheatingLog included
   const result = await Result.create({
     studentId: req.user._id,
     examId,
@@ -47,7 +60,8 @@ const submitResult = asyncHandler(async (req, res) => {
     startTime,
     endTime,
     status,
-    cheatingAttempts
+    cheatingAttempts: cheatingAttempts || validCheatingLog.length,
+    cheatingLog: validCheatingLog
   });
 
   if (result) {
