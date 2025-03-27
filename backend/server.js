@@ -15,15 +15,20 @@ connectDB();
 const app = express();
 const port = process.env.PORT || 5005;
 
-// CORS configuration - update to allow credentials
+// Move CORS configuration earlier and enhance it
 app.use(cors({
   origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://faceid-frontend.vercel.app', 'https://faceid-web.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
-// Middleware
+// Add explicit handling for OPTIONS requests
+app.options('*', cors());
+
+// Regular middleware after CORS
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
