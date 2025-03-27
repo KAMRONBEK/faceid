@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 
-const PageContainer = ({ title, description, children }) => (
+interface PageContainerProps {
+  title: string;
+  description: string;
+  children: ReactNode;
+}
+
+const PageContainer = ({ title, description, children }: PageContainerProps) => (
   <div>
     <Helmet>
       <title>{title}</title>

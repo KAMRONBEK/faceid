@@ -11,7 +11,31 @@ import {
   useTheme
 } from '@mui/material';
 
-const NavItem = ({ item, level, pathDirect, onClick }) => {
+// Add component prop support for MUI components
+declare module '@mui/material/ListItem' {
+  interface ListItemBaseProps {
+    component?: React.ElementType;
+    to?: string;
+    href?: string;
+    target?: string;
+  }
+}
+
+interface NavItemProps {
+  item: {
+    id: string;
+    title: string;
+    icon: any;
+    href: string;
+    external?: boolean;
+    disabled?: boolean;
+  };
+  level: number;
+  pathDirect: string;
+  onClick: () => void;
+}
+
+const NavItem = ({ item, level, pathDirect, onClick }: NavItemProps) => {
   const Icon = item.icon;
   const theme = useTheme();
   const itemIcon = <Icon stroke={1.5} size="1.3rem" />;
@@ -42,7 +66,6 @@ const NavItem = ({ item, level, pathDirect, onClick }) => {
   return (
     <List component="li" disablePadding key={item.id}>
       <ListItemStyled
-        button
         component={item.external ? 'a' : NavLink}
         to={item.href}
         href={item.external ? item.href : ''}

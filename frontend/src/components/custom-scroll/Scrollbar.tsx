@@ -1,14 +1,21 @@
 import PropTypes from 'prop-types';
 import SimpleBar from 'simplebar-react';
 import 'simplebar/dist/simplebar.min.css';
-import { Box, styled } from '@mui/material';
+import { Box, styled, SxProps, Theme } from '@mui/material';
+import { ReactNode } from 'react';
 
 const SimpleBarStyle = styled(SimpleBar)(() => ({
   maxHeight: '100%',
   '.simplebar-scrollbar:before': { backgroundColor: '#2e2d348f' },
 }));
 
-const Scrollbar = (props) => {
+interface ScrollbarProps {
+  children: ReactNode;
+  sx?: SxProps<Theme>;
+  [key: string]: any;
+}
+
+const Scrollbar = (props: ScrollbarProps) => {
   const { children, sx, ...other } = props;
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent,

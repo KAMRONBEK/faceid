@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   AppBar,
@@ -16,12 +16,19 @@ import _ from 'lodash';
 // components
 import Profile from './Profile';
 import { IconBellRinging, IconMenu } from '@tabler/icons-react';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../../hooks/redux';
 
-const Header = (props) => {
+interface HeaderProps {
+  toggleMobileSidebar: () => void;
+  toggleSidebar: () => void;
+  sx?: any;
+}
+
+const Header = (props: HeaderProps) => {
   // const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   // const lgDown = useMediaQuery((theme) => theme.breakpoints.down('lg'));
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useAppSelector((state) => state.auth);
+  const [anchorEl2, setAnchorEl2] = useState<null | HTMLElement>(null);
 
   const AppBarStyled = styled(AppBar)(({ theme }) => ({
     boxShadow: '2px',
@@ -72,8 +79,8 @@ const Header = (props) => {
         </IconButton>
         <Box flexGrow={1} />
         <Stack spacing={1} direction="row" alignItems="center">
-          <Typography variant="contained" color="primary">
-            Hello, {_.startCase(userInfo.name)}
+          <Typography variant="body1" color="primary">
+            Hello, {userInfo?.user?.name ? _.startCase(userInfo.user.name) : 'User'}
           </Typography>
           <Profile />
         </Stack>

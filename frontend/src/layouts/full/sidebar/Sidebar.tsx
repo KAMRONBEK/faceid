@@ -1,10 +1,16 @@
-import { useMediaQuery, Box, Drawer } from '@mui/material';
+import { useMediaQuery, Box, Drawer, Theme } from '@mui/material';
 import Logo from '../shared/logo/Logo';
 import SidebarItems from './SidebarItems';
 // import { Upgrade } from './Updrade';
 
-const Sidebar = (props) => {
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
+interface SidebarProps {
+  isSidebarOpen: boolean;
+  isMobileSidebarOpen: boolean;
+  onSidebarClose: () => void;
+}
+
+const Sidebar = (props: SidebarProps) => {
+  const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
 
   const sidebarWidth = '270px';
 

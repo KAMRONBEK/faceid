@@ -1,8 +1,32 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, ThemeOptions } from "@mui/material/styles";
+import { Shadows } from "@mui/material/styles/shadows";
+// @ts-ignore
 import typography from "./Typography";
+// @ts-ignore
 import { shadows } from "./Shadows";
 
-const baselightTheme = createTheme({
+// Augment the palette to include custom colors
+declare module '@mui/material/styles' {
+  interface Palette {
+    purple: {
+      A50: string;
+      A100: string;
+      A200: string;
+    };
+  }
+  interface PaletteOptions {
+    purple: {
+      A50: string;
+      A100: string;
+      A200: string;
+    };
+  }
+}
+
+// Create a partial shadows array with the proper type
+const themeWithShadows = shadows as unknown as Shadows;
+
+const themeOptions: ThemeOptions = {
   direction: 'ltr',
   palette: {
     primary: {
@@ -39,6 +63,7 @@ const baselightTheme = createTheme({
       dark: '#ae8e59',
       contrastText: '#ffffff',
     },
+    // @ts-ignore - purple is added via module augmentation
     purple: {
       A50: '#EBF3FE',
       A100: '#6610f2',
@@ -51,7 +76,6 @@ const baselightTheme = createTheme({
       400: '#7C8FAC',
       500: '#5A6A85',
       600: '#2A3547',
-
     },
     text: {
       primary: '#2A3547',
@@ -64,10 +88,12 @@ const baselightTheme = createTheme({
     },
     divider: '#e5eaef',
   },
+  // @ts-ignore
   typography,
-  shadows
-},
-  
-);
+  // @ts-ignore
+  shadows: themeWithShadows
+};
+
+const baselightTheme = createTheme(themeOptions);
 
 export { baselightTheme };

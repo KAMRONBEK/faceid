@@ -1,5 +1,17 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Card, CardContent, Typography, Stack, Box } from '@mui/material';
+
+interface DashboardCardProps {
+  title?: string;
+  subtitle?: string;
+  children?: ReactNode;
+  action?: ReactNode;
+  footer?: ReactNode;
+  cardheading?: boolean;
+  headtitle?: string;
+  headsubtitle?: string;
+  middlecontent?: ReactNode;
+}
 
 const DashboardCard = ({
   title,
@@ -11,7 +23,7 @@ const DashboardCard = ({
   headtitle,
   headsubtitle,
   middlecontent,
-}) => {
+}: DashboardCardProps) => {
 
   return (
     <Card

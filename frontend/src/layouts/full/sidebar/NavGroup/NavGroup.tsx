@@ -1,9 +1,16 @@
 import PropTypes from 'prop-types';
+import React from 'react';
 // mui imports
 import { ListSubheader, styled } from '@mui/material';
 
-const NavGroup = ({ item }) => {
-  const ListSubheaderStyle = styled((props) => <ListSubheader disableSticky {...props} />)(
+interface NavGroupProps {
+  item: {
+    subheader: string;
+  };
+}
+
+const NavGroup = ({ item }: NavGroupProps) => {
+  const ListSubheaderStyle = styled((props: any) => <ListSubheader disableSticky {...props} />)(
     ({ theme }) => ({
       ...theme.typography.overline,
       fontWeight: '700',

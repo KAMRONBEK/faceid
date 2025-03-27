@@ -4,10 +4,10 @@ import { useLocation } from 'react-router';
 import { Box, List } from '@mui/material';
 import NavItem from './NavItem';
 import NavGroup from './NavGroup/NavGroup';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../../hooks/redux';
 
 const SidebarItems = () => {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useAppSelector((state) => state.auth);
   const { pathname } = useLocation();
   const pathDirect = pathname;
 
@@ -17,15 +17,15 @@ const SidebarItems = () => {
         {Menuitems.map((item) => {
           // Check if the user is a student and if the item should be hidden
           if (
-            userInfo.role === 'student' &&
-            ['Create Exam', 'Add Questions', 'Exam Logs'].includes(item.title)
+            userInfo?.user && !userInfo.user.isTeacher &&
+            ['Create Exam', 'Add Questions', 'Exam Logs'].includes(item.title || '')
           ) {
             return null; // Don't render this menu item for students
           }
           // {/********SubHeader**********/}
           if (item.subheader) {
             // Check if the user is a student and if the subheader should be hidden
-            if (userInfo.role === 'student' && item.subheader === 'Teacher') {
+            if (userInfo?.user && !userInfo.user.isTeacher && item.subheader === 'Teacher') {
               return null; // Don't render the "Teacher" subheader for students
             }
 
@@ -34,7 +34,26 @@ const SidebarItems = () => {
             // {/********If Sub Menu**********/}
             /* eslint no-else-return: "off" */
           } else {
-            return <NavItem item={item} key={item.id} pathDirect={pathDirect} />;
+            // Cast the item to the expected type for NavItem
+            const navItem = {
+              id: item.id || '',
+              title: item.title || '',
+              icon: item.icon,
+              href: item.href || '',
+              external: false, // Default value
+              disabled: false  // Default value
+            };
+            
+            // Add a dummy onClick function to satisfy the requirement
+            return (
+              <NavItem 
+                item={navItem} 
+                key={item.id} 
+                pathDirect={pathDirect} 
+                onClick={() => {}} 
+                level={0}
+              />
+            );
           }
         })}
       </List>

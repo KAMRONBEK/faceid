@@ -6,7 +6,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { useCreateExamMutation } from '../../slices/examApiSlice.js';
+import { useCreateExamMutation } from '../../slices/examApiSlice';
 
 const examValidationSchema = yup.object({
   examName: yup.string().required('Exam Name is required'),

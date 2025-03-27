@@ -9,10 +9,13 @@ const LinkStyled = styled(Link)(() => ({
   display: 'block',
 }));
 
+// Import SVG as string to fix TypeScript error
+const logoUrl = typeof darkLogo === 'string' ? darkLogo : '';
+
 const Logo = () => {
   return (
     <LinkStyled to="/">
-      <img src={darkLogo} alt="logo" height={70} />
+      <img src={logoUrl} alt="logo" height={70} />
     </LinkStyled>
   )
 };

@@ -1,31 +1,58 @@
-import React from 'react';
+/// <reference types="react" />
+import React, { ErrorInfo, ReactNode } from 'react';
 import { Typography, Button, Box, Container, Paper } from '@mui/material';
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
+// Define the props and state interfaces using type instead of interface
+export type ErrorBoundaryProps = {
+  children: ReactNode;
+  showDetails?: boolean;
+};
+
+export type ErrorBoundaryState = {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+};
+
+/**
+ * Error boundary component to catch and handle errors in the component tree
+ */
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  /**
+   * @param {ErrorBoundaryProps} props
+   */
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { 
       hasError: false,
       error: null,
       errorInfo: null
     };
-  }
+  };
 
-  static getDerivedStateFromError(error) {
+  /**
+   * @param {Error} error
+   * @returns {Partial<ErrorBoundaryState>}
+   */
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     // Update state so the next render will show the fallback UI
     return { hasError: true };
-  }
+  };
 
-  componentDidCatch(error, errorInfo) {
+  /**
+   * @param {Error} error
+   * @param {ErrorInfo} errorInfo
+   */
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // You can log the error to an error reporting service
     console.error("Error caught by ErrorBoundary:", error, errorInfo);
     this.setState({
       error: error,
       errorInfo: errorInfo
     });
-  }
+  };
 
-  handleReset = () => {
+  handleReset = (): void => {
     // Clear the error state
     this.setState({
       hasError: false,
@@ -35,9 +62,9 @@ class ErrorBoundary extends React.Component {
     
     // Optionally refresh the page
     window.location.reload();
-  }
+  };
 
-  render() {
+  render(): React.ReactNode {
     if (this.state.hasError) {
       // You can render any custom fallback UI
       return (

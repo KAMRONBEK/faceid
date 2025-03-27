@@ -1,13 +1,14 @@
-import axios from 'axios';
+import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import { UserInfo } from './types/models';
 
 // Get the API URL from environment variables
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL || '';
 
 if (!API_BASE_URL) {
   console.warn('API_BASE_URL environment variable is not set. API calls may fail.');
 }
 
-const api = axios.create({
+const api: AxiosInstance = axios.create({
   baseURL: `${API_BASE_URL}/api`,
   withCredentials: true, // This ensures cookies are sent with requests
   timeout: 30000, // 30 second timeout
@@ -19,13 +20,14 @@ const api = axios.create({
 
 // Request interceptor
 api.interceptors.request.use(
-  (config) => {
+  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
     const userInfoString = localStorage.getItem('userInfo');
     
     if (userInfoString) {
       try {
-        const userInfo = JSON.parse(userInfoString);
+        const userInfo: UserInfo = JSON.parse(userInfoString);
         if (userInfo && userInfo.token) {
+          config.headers = config.headers || {};
           config.headers.Authorization = `Bearer ${userInfo.token}`;
         }
       } catch (error) {
@@ -35,15 +37,15 @@ api.interceptors.request.use(
     
     return config;
   },
-  (error) => {
+  (error: AxiosError): Promise<AxiosError> => {
     return Promise.reject(error);
   }
 );
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response: AxiosResponse): AxiosResponse => response,
+  (error: AxiosError): Promise<AxiosError> => {
     // Handle errors globally here
     if (error.response && error.response.status === 401) {
       // Handle unauthorized access - perhaps redirect to login
@@ -53,4 +55,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
+export default api; 

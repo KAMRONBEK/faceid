@@ -1,8 +1,13 @@
 import { Card } from '@mui/material';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import PropTypes from 'prop-types';
 
-const BlankCard = ({ children, className }) => {
+interface BlankCardProps {
+  children: ReactNode;
+  className?: string;
+}
+
+const BlankCard = ({ children, className }: BlankCardProps) => {
   return (
     <Card
       sx={{ p: 0, position: 'relative' }}
@@ -17,6 +22,7 @@ const BlankCard = ({ children, className }) => {
 
 BlankCard.propTypes = {
   children: PropTypes.node,
+  className: PropTypes.string,
 };
 
 export default BlankCard;
