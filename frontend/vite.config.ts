@@ -30,7 +30,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     },
     build: {
-      outDir: 'build',
+      outDir: 'dist',
       // sourcemap for better debugging
       sourcemap: true,
     },
