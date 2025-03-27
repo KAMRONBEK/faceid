@@ -57,32 +57,17 @@ const resultSchema = mongoose.Schema(
       type: Number,
       default: 0
     },
-    cheatingDetails: {
-      usedPhone: {
-        type: Boolean,
-        default: false
-      },
-      usedBook: {
-        type: Boolean,
-        default: false
-      },
-      leftExamScreen: {
-        type: Boolean,
-        default: false
-      },
-      otherPersonDetected: {
-        type: Boolean,
-        default: false
-      },
-      audioDetected: {
-        type: Boolean,
-        default: false
-      },
-      additionalNotes: {
+    cheatingLog: [{
+      type: {
         type: String,
-        default: ''
+        enum: ['cell_phone', 'book', 'no_face', 'multiple_faces', 'tab_change', 'other'],
+        required: true
+      },
+      timestamp: {
+        type: Date,
+        required: true
       }
-    }
+    }]
   },
   {
     timestamps: true
