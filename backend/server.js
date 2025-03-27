@@ -17,7 +17,7 @@ const port = process.env.PORT || 5005;
 
 // CORS configuration - update to allow credentials
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://faceid-frontend.vercel.app'],
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://faceid-frontend.vercel.app', 'https://faceid-web.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
