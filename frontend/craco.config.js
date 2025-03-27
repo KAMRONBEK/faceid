@@ -8,6 +8,11 @@ module.exports = {
       ];
       
       return webpackConfig;
+    },
+    configure: {
+      output: {
+        publicPath: '/',
+      },
     }
   },
   jest: {
