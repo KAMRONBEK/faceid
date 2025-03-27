@@ -18,10 +18,10 @@ const Success = Loadable(lazy(() => import('../views/Success')));
 // const Shadow = Loadable(lazy(() => import('../views/utilities/Shadow')));
 //Student Routes
 
-const TestPage = Loadable(lazy(() => import('./../views/student/TestPage')));
-const ExamPage = Loadable(lazy(() => import('./../views/student/ExamPage')));
-const ExamDetails = Loadable(lazy(() => import('./../views/student/ExamDetails')));
-const ResultPage = Loadable(lazy(() => import('./../views/student/ResultPage')));
+const TestPage = Loadable(lazy(() => import('../views/student/TestPage')));
+const ExamPage = Loadable(lazy(() => import('../views/student/ExamPage')));
+const ExamDetails = Loadable(lazy(() => import('../views/student/ExamDetails')));
+const ResultPage = Loadable(lazy(() => import('../views/student/ResultPage')));
 //Auth Routes
 const Error = Loadable(lazy(() => import('../views/authentication/Error')));
 const Register = Loadable(lazy(() => import('../views/authentication/Register')));
@@ -29,14 +29,15 @@ const Login = Loadable(lazy(() => import('../views/authentication/Login')));
 const UserAccount = Loadable(lazy(() => import('../views/authentication/UserAccount')));
 
 // Teacher Routes
-const CreateExamPage = Loadable(lazy(() => import('./../views/teacher/CreateExamPage')));
-const ExamLogPage = Loadable(lazy(() => import('./../views/teacher/ExamLogPage')));
-const AddQuestions = Loadable(lazy(() => import('./../views/teacher/AddQuestions')));
-const PrivateRoute = Loadable(lazy(() => import('src/views/authentication/PrivateRoute')));
-const TeacherRoute = Loadable(lazy(() => import('src/views/authentication/TeacherRoute')));
+const CreateExamPage = Loadable(lazy(() => import('../views/teacher/CreateExamPage')));
+const ExamLogPage = Loadable(lazy(() => import('../views/teacher/ExamLogPage')));
+const AddQuestions = Loadable(lazy(() => import('../views/teacher/AddQuestions')));
+const PrivateRoute = Loadable(lazy(() => import('../views/authentication/PrivateRoute')));
+const TeacherRoute = Loadable(lazy(() => import('../views/authentication/TeacherRoute')));
 
 // Public URL path from environment or empty string
-const publicUrl = process.env.PUBLIC_URL || '';
+const publicUrl = import.meta.env.BASE_URL || '';
+const isDevelopment = import.meta.env.MODE === 'development';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -73,14 +74,15 @@ const Router = createBrowserRouter(
       {/* Authentication layout */}
       <Route path="/auth" element={<BlankLayout />}>
         <Route path="404" element={<Error />} />
-        <Route path="/auth/register" element={<Register />} />
-        <Route path="/auth/login" element={
-          <ErrorBoundary showDetails={process.env.NODE_ENV !== 'production'}>
+        <Route path="register" element={<Register />} />
+        <Route path="login" element={
+          <ErrorBoundary showDetails={isDevelopment}>
             <Login />
           </ErrorBoundary>
         } />
-        {/* <Route path="*" element={<Navigate to="/auth/404" />} /> */}
+        <Route path="*" element={<Navigate to="/auth/404" />} />
       </Route>
+      <Route path="*" element={<Navigate to="/auth/404" />} />
     </>,
   ),
   { basename: publicUrl } // Add basename configuration

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ReactComponent as LogoDark } from 'src/assets/images/logos/dark-logo.svg';
+import darkLogo from 'src/assets/images/logos/dark-logo.svg';
 import { styled } from '@mui/material';
 
 const LinkStyled = styled(Link)(() => ({
@@ -12,7 +12,7 @@ const LinkStyled = styled(Link)(() => ({
 const Logo = () => {
   return (
     <LinkStyled to="/">
-      <LogoDark height={70} />
+      <img src={darkLogo} alt="logo" height={70} />
     </LinkStyled>
   )
 };

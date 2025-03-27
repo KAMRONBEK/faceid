@@ -5,6 +5,12 @@
     "scripts": {
         "start": "concurrently \"cd backend && npm run server\" \"cd frontend && npm start\"",
         "dev": "concurrently \"cd backend && npm run server\" \"cd frontend && npm start\"",
+        "dev:backend": "cd backend && npm run server",
+        "dev:frontend": "cd frontend && npm start",
+        "restart:frontend": "cd frontend && (pkill -f 'node server.cjs' || true) && npm start",
+        "build": "cd frontend && npm run build",
+        "build:staging": "cd frontend && npm run build:staging",
+        "build:production": "cd frontend && npm run build:production",
         "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install"
     },
     "devDependencies": {
