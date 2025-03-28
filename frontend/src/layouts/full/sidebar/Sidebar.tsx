@@ -1,7 +1,6 @@
 import { useMediaQuery, Box, Drawer, Theme } from '@mui/material';
 import Logo from '../shared/logo/Logo';
 import SidebarItems from './SidebarItems';
-// import { Upgrade } from './Updrade';
 
 interface SidebarProps {
   isSidebarOpen: boolean;
@@ -55,7 +54,6 @@ const Sidebar = (props: SidebarProps) => {
               {/* Sidebar Items */}
               {/* ------------------------------------------- */}
               <SidebarItems />
-              {/* <Upgrade /> */}
             </Box>
           </Box>
         </Drawer>
@@ -86,7 +84,6 @@ const Sidebar = (props: SidebarProps) => {
       {/* Sidebar For Mobile */}
       {/* ------------------------------------------- */}
       <SidebarItems />
-      {/* <Upgrade /> */}
     </Drawer>
   );
 };
