@@ -17,12 +17,12 @@ const port = process.env.PORT || 5005;
 
 // Move CORS configuration earlier and enhance it
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://faceid-frontend.vercel.app', 'https://faceid-web.vercel.app'],
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://imtihonai.uz', 'https://faceid-web.vercel.app'],  
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true,
   preflightContinue: false,
-  optionsSuccessStatus: 204
+  optionsSuccessStatus: 204 
 }));
 
 // Add explicit handling for OPTIONS requests

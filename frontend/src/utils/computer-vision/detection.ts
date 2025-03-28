@@ -2,7 +2,7 @@ import {  ObjectDetection, FaceDetection, DetectionResult } from '../../componen
 
 // Basic lists of prohibited objects
 const PROHIBITED_OBJECTS = ['cell phone', 'book', 'laptop', 'remote', 'keyboard'];
-const ALLOWED_OBJECTS = ['cup', 'bottle', 'glasses', 'pen', 'pencil', 'mouse', 'paper', 'notebook', 'person'];
+const ALLOWED_OBJECTS = ['cup', 'bottle', 'glasses', 'pen', 'pencil', 'mouse', 'paper', 'notebook'];
 
 /**
  * Simplified object detection function
@@ -52,32 +52,28 @@ export const detectObjects = async (
       }
     }
     
-    // Count objects
-    const personObjects = objects.filter((obj: any) => obj.class.toLowerCase() === 'person');
-    result.stats.persons = personObjects.length;
+    // Update face stats
     result.stats.faces = faces.length;
     
     // Update events
-    result.events.noFace = (result.stats.persons === 0 && result.stats.faces === 0);
-    result.events.multipleFaces = (result.stats.persons > 1 || result.stats.faces > 1);
+    result.events.noFace = (result.stats.faces === 0);
+    result.events.multipleFaces = (result.stats.faces > 1);
     
-    // Process objects
+    // Process objects (excluding persons)
     objects.forEach((object: ObjectDetection) => {
       const objectClass = object.class.toLowerCase();
+      
+      // Skip person objects
+      if (objectClass === "person") {
+        return;
+      }
       
       // Check if object is prohibited or allowed
       const isProhibited = PROHIBITED_OBJECTS.some(item => objectClass.includes(item));
       const isAllowed = ALLOWED_OBJECTS.some(item => objectClass.includes(item));
       
       // Handle specific objects
-      if (objectClass === "person") {
-        result.relevantObjects.push({
-          ...object,
-          isAllowed: !result.events.multipleFaces,
-          isProhibited: result.events.multipleFaces,
-          isWarning: result.events.multipleFaces
-        });
-      } else if (objectClass === 'cell phone') {
+      if (objectClass === 'cell phone') {
         result.stats.cellPhones++;
         result.events.hasCellPhone = true;
         result.relevantObjects.push({
