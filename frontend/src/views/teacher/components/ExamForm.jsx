@@ -4,10 +4,6 @@ import {
   Typography,
   Button,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from '@mui/material';
 
 const CreateExam = ({ formik, title, subtitle, subtext }) => {

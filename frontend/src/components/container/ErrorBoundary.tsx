@@ -75,7 +75,9 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
               p: 4, 
               textAlign: 'center',
               borderRadius: 2,
-              backgroundColor: 'rgba(255, 255, 255, 0.9)'
+              backgroundColor: '#ffebee',  // Light red background
+              border: '1px solid #f44336', // Red border
+              boxShadow: '0 4px 20px rgba(244, 67, 54, 0.2)' // Red shadow
             }}
           >
             <Typography variant="h4" color="error" gutterBottom>
@@ -87,7 +89,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             </Typography>
             
             {this.props.showDetails && this.state.error && (
-              <Box sx={{ mt: 2, mb: 3, textAlign: 'left', bgcolor: '#f5f5f5', p: 2, borderRadius: 1 }}>
+              <Box sx={{ mt: 2, mb: 3, textAlign: 'left', bgcolor: '#fff', p: 2, borderRadius: 1 }}>
                 <Typography variant="subtitle2" component="div" sx={{ mb: 1 }}>
                   Error details:
                 </Typography>
@@ -95,16 +97,42 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-word',
                   color: '#d32f2f',
-                  fontSize: '0.8rem'
+                  fontSize: '0.8rem',
+                  maxHeight: '200px',
+                  overflow: 'auto',
+                  padding: '8px',
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: '4px'
                 }}>
                   {this.state.error.toString()}
                 </Typography>
+                
+                {this.state.errorInfo && (
+                  <>
+                    <Typography variant="subtitle2" component="div" sx={{ mt: 2, mb: 1 }}>
+                      Component stack:
+                    </Typography>
+                    <Typography variant="body2" component="pre" sx={{ 
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word',
+                      color: '#666',
+                      fontSize: '0.8rem',
+                      maxHeight: '200px',
+                      overflow: 'auto',
+                      padding: '8px',
+                      backgroundColor: '#f5f5f5',
+                      borderRadius: '4px'
+                    }}>
+                      {this.state.errorInfo.componentStack}
+                    </Typography>
+                  </>
+                )}
               </Box>
             )}
             
             <Button 
               variant="contained" 
-              color="primary"
+              color="error"
               onClick={this.handleReset}
               sx={{ mt: 2 }}
             >

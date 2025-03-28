@@ -1,12 +1,9 @@
 import {
-  IconAperture,
-  IconCopy,
   IconLayoutDashboard,
   IconLogin,
   IconMoodHappy,
   IconTypography,
   IconUserPlus,
-  IconPlayerPlayFilled,
   IconClipboardList,
   IconCamera,
 } from '@tabler/icons-react';

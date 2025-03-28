@@ -1,5 +1,4 @@
-import { fetchBaseQuery, createApi, FetchBaseQueryError, BaseQueryFn } from '@reduxjs/toolkit/query/react';
-import { RootState, AppStore } from '../store';
+import { fetchBaseQuery, createApi } from '@reduxjs/toolkit/query/react';
 import { UserInfo } from '../types/models';
 
 const baseQuery = fetchBaseQuery({ 

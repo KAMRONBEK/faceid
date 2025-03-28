@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Grid, CircularProgress, Typography, Card, TextField, IconButton, Avatar, Paper, List, ListItem, ListItemIcon, ListItemText, Divider, Button } from '@mui/material';
+import { Box, Grid, CircularProgress, Typography } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import BlankCard from 'src/components/shared/BlankCard';
 import MultipleChoiceQuestion from './Components/MultipleChoiceQuestion';
@@ -11,9 +11,6 @@ import { useSaveCheatingLogMutation } from 'src/slices/cheatingLogApiSlice';
 import { useSubmitResultMutation, useGetResultsQuery } from '../../slices/resultsApiSlice';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import SendIcon from '@mui/icons-material/Send';
 
 const TestPage = () => {
   const { examId, testId } = useParams();

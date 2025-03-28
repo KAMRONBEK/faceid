@@ -63,6 +63,7 @@
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-react": "7.32.2",
     "eslint-plugin-react-hooks": "4.6.0",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "prettier": "2.8.8",
     "typescript": "^5.4.3",
     "vite": "^5.4.15",
@@ -80,6 +81,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --fix",
     "type-check": "tsc --noEmit",
     "type-check:watch": "tsc --noEmit --watch"
   },

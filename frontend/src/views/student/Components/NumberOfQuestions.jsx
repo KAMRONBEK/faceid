@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
-import BlankCard from 'src/components/shared/BlankCard';
 import { Box, Button, Stack, Typography } from '@mui/material';
-import Countdown from 'react-countdown';
 
 const NumberOfQuestions = ({ 
   questionLength, 

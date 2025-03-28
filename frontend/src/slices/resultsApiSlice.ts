@@ -11,11 +11,13 @@ export const resultsApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    getStudentResults: builder.query({
+    getResults: builder.query({
       query: () => ({
         url: RESULTS_URL,
         method: 'GET',
       }),
+      // The backend API should handle role-specific filtering based on the user's token
+      // This endpoint will return different data depending on the user's role
       keepUnusedDataFor: 5,
     }),
     getExamResults: builder.query({
@@ -33,7 +35,7 @@ export const resultsApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useSubmitResultMutation,
-  useGetStudentResultsQuery,
+  useGetResultsQuery,
   useGetExamResultsQuery,
   useGetResultDetailsQuery,
 } = resultsApiSlice; 

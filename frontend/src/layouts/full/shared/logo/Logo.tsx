@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { styled, Typography, Box } from '@mui/material';
+import { styled, Typography } from '@mui/material';
 
 const LinkStyled = styled(Link)(() => ({
   height: '70px',

@@ -12,7 +12,7 @@
     }
   },
   "extends": ["react-app", "react-app/jest", "prettier"],
-  "plugins": ["prettier"],
+  "plugins": ["prettier", "unused-imports"],
   "rules": {
     "comma-dangle": "off",
     "import/no-unresolved": "off",
@@ -27,6 +27,16 @@
     "react/require-default-props": "off",
     "react/jsx-no-bind": "off",
     "no-nested-ternary": "off",
-    "react/destructuring-assignment": "off"
+    "react/destructuring-assignment": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      { 
+        "vars": "all", 
+        "varsIgnorePattern": "^_", 
+        "args": "after-used", 
+        "argsIgnorePattern": "^_" 
+      }
+    ]
   }
 }

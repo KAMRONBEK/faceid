@@ -9,14 +9,12 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
-  Typography,
 } from '@mui/material';
 
 import { IconListCheck, IconMail, IconUser } from '@tabler/icons-react';
 
 import ProfileImg from 'src/assets/images/profile/user-1.jpg';
 
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../../hooks/redux';
 

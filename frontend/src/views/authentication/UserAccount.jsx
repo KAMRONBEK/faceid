@@ -1,8 +1,6 @@
-import React, { useEffect } from 'react';
-import { Grid, Box, Card, Typography, Stack } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Grid, Box, Card, Typography } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
-import Logo from 'src/layouts/full/shared/logo/Logo';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
@@ -10,7 +8,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useUpdateUserMutation } from '../../slices/usersApiSlice';
 import { setCredentials } from '../../slices/authSlice';
-import Loader from './Loader';
 import AuthUpdate from './auth/AuthUpdate';
 
 const userValidationSchema = yup.object({

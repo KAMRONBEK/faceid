@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Box,
@@ -24,7 +24,7 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import { useGetStudentResultsQuery, useGetExamResultsQuery } from '../../slices/resultsApiSlice';
+import { useGetResultsQuery, useGetExamResultsQuery } from '../../slices/resultsApiSlice';
 import { useSelector } from 'react-redux';
 import PageContainer from 'src/components/container/PageContainer';
 
@@ -51,7 +51,7 @@ const ResultPage = () => {
     data: studentResults, 
     isLoading: studentResultsLoading, 
     error: studentResultsError 
-  } = useGetStudentResultsQuery(undefined, {
+  } = useGetResultsQuery(undefined, {
     skip: isTeacher && examId
   });
 
