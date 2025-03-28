@@ -35,6 +35,9 @@ const AddQuestions = Loadable(lazy(() => import('../views/teacher/AddQuestions')
 const PrivateRoute = Loadable(lazy(() => import('../views/authentication/PrivateRoute')));
 const TeacherRoute = Loadable(lazy(() => import('../views/authentication/TeacherRoute')));
 
+// Computer Vision Routes
+const ObjectDetectionScreen = Loadable(lazy(() => import('../components/computer-vision/ObjectDetectionScreen')));
+
 // Public URL path from environment or empty string
 const publicUrl = import.meta.env.BASE_URL || '' as string;
 const isDevelopment = (import.meta.env.MODE === 'development') as boolean;
@@ -55,6 +58,7 @@ const Router = createBrowserRouter(
           <Route path="/exam" element={<ExamPage />} />
           <Route path="/result" element={<ResultPage />} />
           <Route path="/exam-results/:examId" element={<ResultPage />} />
+          <Route path="/object-detection" element={<ObjectDetectionScreen />} />
           <Route path="" element={<TeacherRoute />}>
             <Route path="/create-exam" element={<CreateExamPage />} />
             <Route path="/add-questions" element={<AddQuestions />} />

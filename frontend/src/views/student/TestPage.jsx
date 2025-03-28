@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Grid, CircularProgress, Typography } from '@mui/material';
+import { Box, Grid, CircularProgress, Typography, Card, TextField, IconButton, Avatar, Paper, List, ListItem, ListItemIcon, ListItemText, Divider, Button } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import BlankCard from 'src/components/shared/BlankCard';
 import MultipleChoiceQuestion from './Components/MultipleChoiceQuestion';
@@ -8,9 +8,12 @@ import NumberOfQuestions from './Components/NumberOfQuestions';
 import WebCam from './Components/WebCam';
 import { useGetExamsQuery, useGetQuestionsQuery } from '../../slices/examApiSlice';
 import { useSaveCheatingLogMutation } from 'src/slices/cheatingLogApiSlice';
-import { useSubmitResultMutation } from '../../slices/resultsApiSlice';
+import { useSubmitResultMutation, useGetResultsQuery } from '../../slices/resultsApiSlice';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SendIcon from '@mui/icons-material/Send';
 
 const TestPage = () => {
   const { examId, testId } = useParams();
@@ -27,12 +30,37 @@ const TestPage = () => {
   const [answers, setAnswers] = useState([]);
   const [cheatingLog, setCheatingLog] = useState([]);
 
+  // Check if this test has already been completed
+  const { data: results, isLoading: resultsLoading } = useGetResultsQuery();
+  const [testAlreadyCompleted, setTestAlreadyCompleted] = useState(false);
+  
+  // Add current question state to parent component
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  
   const [saveCheatingLogMutation] = useSaveCheatingLogMutation();
   const [submitResult] = useSubmitResultMutation();
   const { userInfo } = useSelector((state) => state.auth);
 
+  // Check if test is already completed when returning via back button
+  useEffect(() => {
+    if (results && examId) {
+      const completedTest = results.find(result => result.examId === examId);
+      if (completedTest) {
+        setTestAlreadyCompleted(true);
+        toast.info('You have already completed this test. Redirecting to results page...');
+        // Redirect to results page after a short delay
+        const timer = setTimeout(() => {
+          navigate('/success', { replace: true });
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [results, examId, navigate]);
+
   // Track tab changes as cheating
   useEffect(() => {
+    if (testAlreadyCompleted) return;
+    
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // User switched to another tab or minimized the window
@@ -56,7 +84,7 @@ const TestPage = () => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [testAlreadyCompleted]);
 
   useEffect(() => {
     if (userExamdata) {
@@ -190,15 +218,36 @@ const TestPage = () => {
     }]);
   };
 
+  // Add function to handle question navigation
+  const handleQuestionChange = (newQuestionIndex) => {
+    if (newQuestionIndex >= 0 && newQuestionIndex < questions.length) {
+      setCurrentQuestion(newQuestionIndex);
+    }
+  };
+
   const saveCheatingLog = (log) => {
     setCheatingLog(prevLogs => [...prevLogs, log]);
   };
 
   // Show loading state if either exams or questions are still loading
-  if (examsLoading || questionsLoading) {
+  if (examsLoading || questionsLoading || resultsLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Handle already completed test case
+  if (testAlreadyCompleted) {
+    return (
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="80vh">
+        <Typography variant="h5" gutterBottom>
+          You have already completed this test
+        </Typography>
+        <Typography variant="body1">
+          Redirecting to results page...
+        </Typography>
       </Box>
     );
   }
@@ -227,65 +276,66 @@ const TestPage = () => {
 
   return (
     <PageContainer title="TestPage" description="This is TestPage">
-      <Box pt="3rem">
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={7} lg={7}>
-            <BlankCard>
-              <Box
-                width="100%"
-                minHeight="400px"
-                boxShadow={3}
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                justifyContent="center"
+      <Box sx={{ height: 'calc(100vh - 100px)', p: 3 }}>
+        <Grid container spacing={3} sx={{ height: '100%' }}>
+          {/* Main Camera Area (Left Side) */}
+          <Grid item xs={12} md={7} sx={{ height: '100%' }}>
+            <BlankCard sx={{ height: '100%' }}>
+              <Box 
+                sx={{ 
+                  position: 'relative', 
+                  height: '100%', 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  overflow: 'hidden'
+                }}
               >
-                <MultipleChoiceQuestion
-                  questions={questions}
-                  saveUserTestScore={saveUserTestScore}
-                  onFinish={handleTestSubmission}
-                />
+                <WebCam onCheatingDetected={saveCheatingLog} />
               </Box>
             </BlankCard>
           </Grid>
-          <Grid item xs={12} md={5} lg={5}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <BlankCard>
-                  <Box
-                    maxHeight="300px"
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'start',
-                      justifyContent: 'center',
-                      overflowY: 'auto',
-                      height: '100%',
-                    }}
-                  >
-                    <NumberOfQuestions
-                      questionLength={questions.length}
-                      submitTest={handleTestSubmission}
-                      examDurationInSeconds={examDurationInSeconds}
-                    />
-                  </Box>
-                </BlankCard>
-              </Grid>
-              <Grid item xs={12}>
-                <BlankCard>
-                  <Box
-                    width="300px"
-                    maxHeight="180px"
-                    boxShadow={3}
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="start"
-                    justifyContent="center"
-                  >
-                    <WebCam onCheatingDetected={saveCheatingLog} />
-                  </Box>
-                </BlankCard>
-              </Grid>
+          
+          {/* Right Panel */}
+          <Grid item xs={12} md={5} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {/* Controls at top, made smaller */}
+            <Grid item sx={{ mb: 2 }}>
+              <BlankCard>
+                <Box sx={{ p: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <NumberOfQuestions
+                    questionLength={questions.length}
+                    submitTest={handleTestSubmission}
+                    examDurationInSeconds={examDurationInSeconds}
+                    currentQuestion={currentQuestion}
+                    onQuestionSelect={handleQuestionChange}
+                  />
+                </Box>
+              </BlankCard>
+            </Grid>
+            
+            {/* Questions with larger space */}
+            <Grid item sx={{ flex: 1 }}>
+              <BlankCard sx={{ height: '100%' }}>
+                <Box 
+                  sx={{ 
+                    height: '100%',
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                    overflow: 'auto'
+                  }}
+                >
+                  <MultipleChoiceQuestion
+                    questions={questions}
+                    saveUserTestScore={saveUserTestScore}
+                    onFinish={handleTestSubmission}
+                    currentQuestion={currentQuestion}
+                    setCurrentQuestion={handleQuestionChange}
+                  />
+                </Box>
+              </BlankCard>
             </Grid>
           </Grid>
         </Grid>

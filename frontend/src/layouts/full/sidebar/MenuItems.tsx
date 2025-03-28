@@ -8,6 +8,7 @@ import {
   IconUserPlus,
   IconPlayerPlayFilled,
   IconClipboardList,
+  IconCamera,
 } from '@tabler/icons-react';
 
 import { uniqueId } from 'lodash';
@@ -61,6 +62,16 @@ const Menuitems = [
     title: 'Exam Logs',
     icon: IconUserPlus,
     href: '/exam-log',
+  },
+  {
+    navlabel: true,
+    subheader: 'Computer Vision',
+  },
+  {
+    id: uniqueId(),
+    title: 'Object Detection',
+    icon: IconCamera,
+    href: '/object-detection',
   },
   // {
   //   id: uniqueId(),

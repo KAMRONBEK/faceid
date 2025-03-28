@@ -1,44 +1,64 @@
 import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
-import questions from './questionData';
 import BlankCard from 'src/components/shared/BlankCard';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import Countdown from 'react-countdown';
-const NumberOfQuestions = ({ questionLength, submitTest, examDurationInSeconds }) => {
-  const totalQuestions = questionLength; //questions.length;
+
+const NumberOfQuestions = ({ 
+  questionLength, 
+  submitTest, 
+  examDurationInSeconds, 
+  currentQuestion = 0, 
+  onQuestionSelect
+}) => {
+  const totalQuestions = questionLength;
   // Generate an array of question numbers from 1 to totalQuestions
   const questionNumbers = Array.from({ length: totalQuestions }, (_, index) => index + 1);
+  
   const handleQuestionButtonClick = (questionNumber) => {
-    // Set the current question to the selected question number
-    // setCurrentQuestion(questionNumber);
+    // Call the parent's function to change the question (0-based index)
+    if (onQuestionSelect) {
+      onQuestionSelect(questionNumber - 1);
+    }
   };
 
-  // Create an array of rows, each containing up to 4 question numbers
+  // Create an array of rows, each containing up to 5 question numbers
   const rows = [];
   for (let i = 0; i < questionNumbers.length; i += 5) {
     rows.push(questionNumbers.slice(i, i + 5));
   }
 
   // Timer related states
-  const [timer, setTimer] = useState(400); // Initialize timer with examDurationInSeconds
+  const [timeRemaining, setTimeRemaining] = useState(examDurationInSeconds);
+  
   // Countdown timer
   useEffect(() => {
-    setTimer(400);
+    if (examDurationInSeconds <= 0) return;
+    
+    setTimeRemaining(examDurationInSeconds);
     const countdown = setInterval(() => {
-      setTimer((prevTimer) => prevTimer - 1);
+      setTimeRemaining((prevTimer) => {
+        if (prevTimer <= 1) {
+          clearInterval(countdown);
+          if (submitTest) submitTest(); // Automatically submit the test when time runs out
+          return 0;
+        }
+        return prevTimer - 1;
+      });
     }, 1000);
-
-    // Check if the timer has reached 0
-    if (timer <= 0) {
-      clearInterval(countdown); // Stop the timer
-      submitTest(); // Automatically submit the test
-    }
 
     return () => {
       clearInterval(countdown); // Cleanup the timer when the component unmounts
     };
-  }, []); // Empty dependency array to run this effect only once when the component mounts
+  }, [examDurationInSeconds, submitTest]);
+
+  // Format the time as MM:SS
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   return (
     <>
@@ -46,24 +66,23 @@ const NumberOfQuestions = ({ questionLength, submitTest, examDurationInSeconds }
         position="sticky"
         top="0"
         zIndex={1}
-        bgcolor="white" // Set background color as needed
-        paddingY="10px" // Add padding to top and bottom as needed
+        bgcolor="white"
+        paddingY="10px"
         width="100%"
         px={3}
-        // mb={5}
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6">Questions: 1/10</Typography>
+          <Typography variant="h6">Questions: {currentQuestion + 1}/{totalQuestions}</Typography>
           <Typography variant="h6">
-            Time Left: {Math.floor(timer / 60)}:{timer % 60}
+            Time Left: {formatTime(timeRemaining)}
           </Typography>
-          <Button variant="contained" onClick={submitTest} color="error">
+          <Button variant="contained" onClick={submitTest} color="error" disabled={!submitTest}>
             Finish Test
           </Button>
         </Stack>
       </Box>
 
-      <Box p={3} mt={5} maxHeight="270px">
+      <Box p={2} maxHeight="150px" overflow="auto">
         <Grid container spacing={1}>
           {rows.map((row, rowIndex) => (
             <Grid key={rowIndex} item xs={12}>
@@ -73,12 +92,13 @@ const NumberOfQuestions = ({ questionLength, submitTest, examDurationInSeconds }
                     key={questionNumber}
                     variant="rounded"
                     style={{
-                      width: '40px',
-                      height: '40px',
-                      fontSize: '20px',
+                      width: '36px',
+                      height: '36px',
+                      fontSize: '16px',
                       cursor: 'pointer',
                       margin: '3px',
-                      background: '#ccc',
+                      background: questionNumber === currentQuestion + 1 ? '#1976d2' : '#ccc',
+                      color: questionNumber === currentQuestion + 1 ? 'white' : 'black',
                     }}
                     onClick={() => handleQuestionButtonClick(questionNumber)}
                   >

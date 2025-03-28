@@ -11,29 +11,58 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import CircularProgress from '@mui/material/CircularProgress';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 import { Container } from '@mui/material';
 import { useGetQuestionsQuery } from 'src/slices/examApiSlice';
 import { useParams } from 'react-router';
 
-export default function MultipleChoiceQuestion({ questions, saveUserTestScore }) {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+export default function MultipleChoiceQuestion({ 
+  questions, 
+  saveUserTestScore, 
+  onFinish, 
+  currentQuestion, 
+  setCurrentQuestion
+}) {
+  // Using currentQuestion from props instead of local state
   const [selectedOption, setSelectedOption] = useState(null);
   const [selectedOptionText, setSelectedOptionText] = useState('');
   const [isLastQuestion, setIsLastQuestion] = useState(false);
   const [isFinishTest, setisFinishTest] = useState(false);
+  
+  // Store selected answers to restore when navigating questions
+  const [answersState, setAnswersState] = useState([]);
 
   useEffect(() => {
     if (questions && questions.length > 0) {
       setIsLastQuestion(currentQuestion === questions.length - 1);
+      
+      // Check if we have a stored answer for this question
+      const storedAnswer = answersState[currentQuestion];
+      if (storedAnswer) {
+        setSelectedOption(storedAnswer.optionId);
+        setSelectedOptionText(storedAnswer.optionText);
+      } else {
+        setSelectedOption(null);
+        setSelectedOptionText('');
+      }
     }
-  }, [currentQuestion, questions]);
+  }, [currentQuestion, questions, answersState]);
 
   const handleOptionChange = (event) => {
     const optionId = event.target.value;
     setSelectedOption(optionId);
     const option = questions[currentQuestion].options.find(opt => opt._id === optionId);
     setSelectedOptionText(option.optionText);
+    
+    // Store the answer in our local state
+    const newAnswersState = [...answersState];
+    newAnswersState[currentQuestion] = {
+      optionId,
+      optionText: option.optionText
+    };
+    setAnswersState(newAnswersState);
   };
 
   const handleNextQuestion = () => {
@@ -42,19 +71,23 @@ export default function MultipleChoiceQuestion({ questions, saveUserTestScore })
     const isCorrect = correctOption._id === selectedOption;
 
     // Save the answer
-    saveUserTestScore(
-      currentQuestionData._id,
-      selectedOptionText,
-      isCorrect
-    );
-
-    setSelectedOption(null);
-    setSelectedOptionText('');
+    if (saveUserTestScore) {
+      saveUserTestScore(
+        currentQuestionData._id,
+        selectedOptionText,
+        isCorrect
+      );
+    }
     
     if (currentQuestion < questions.length - 1) {
+      // Move to next question using parent's state handler
       setCurrentQuestion(currentQuestion + 1);
     } else {
+      // Finish test
       setisFinishTest(true);
+      if (onFinish) {
+        onFinish();
+      }
     }
   };
 
