@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Grid, CircularProgress, Typography } from '@mui/material';
+import { Box, Grid, CircularProgress, Typography, Card, TextField, IconButton, Avatar, Paper, List, ListItem, ListItemIcon, ListItemText, Divider, Button } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import BlankCard from 'src/components/shared/BlankCard';
 import MultipleChoiceQuestion from './Components/MultipleChoiceQuestion';
@@ -11,6 +11,9 @@ import { useSaveCheatingLogMutation } from 'src/slices/cheatingLogApiSlice';
 import { useSubmitResultMutation, useGetResultsQuery } from '../../slices/resultsApiSlice';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SendIcon from '@mui/icons-material/Send';
 
 const TestPage = () => {
   const { examId, testId } = useParams();
@@ -27,9 +30,8 @@ const TestPage = () => {
   const [answers, setAnswers] = useState([]);
   const [cheatingLog, setCheatingLog] = useState([]);
 
-  // Check if this test has already been completed
+  // Keep the query but remove the state and related logic
   const { data: results, isLoading: resultsLoading } = useGetResultsQuery();
-  const [testAlreadyCompleted, setTestAlreadyCompleted] = useState(false);
   
   // Add current question state to parent component
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -38,26 +40,8 @@ const TestPage = () => {
   const [submitResult] = useSubmitResultMutation();
   const { userInfo } = useSelector((state) => state.auth);
 
-  // Check if test is already completed when returning via back button
-  useEffect(() => {
-    if (results && examId) {
-      const completedTest = results.find(result => result.examId === examId);
-      if (completedTest) {
-        setTestAlreadyCompleted(true);
-        toast.info('You have already completed this test. Redirecting to results page...');
-        // Redirect to results page after a short delay
-        const timer = setTimeout(() => {
-          navigate('/success', { replace: true });
-        }, 2000);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [results, examId, navigate]);
-
   // Track tab changes as cheating
   useEffect(() => {
-    if (testAlreadyCompleted) return;
-    
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // User switched to another tab or minimized the window
@@ -81,7 +65,7 @@ const TestPage = () => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [testAlreadyCompleted]);
+  }, []);
 
   useEffect(() => {
     if (userExamdata) {
@@ -231,20 +215,6 @@ const TestPage = () => {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
         <CircularProgress />
-      </Box>
-    );
-  }
-
-  // Handle already completed test case
-  if (testAlreadyCompleted) {
-    return (
-      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="80vh">
-        <Typography variant="h5" gutterBottom>
-          You have already completed this test
-        </Typography>
-        <Typography variant="body1">
-          Redirecting to results page...
-        </Typography>
       </Box>
     );
   }

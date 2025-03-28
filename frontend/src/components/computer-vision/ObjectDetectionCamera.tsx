@@ -1,100 +1,27 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Webcam from 'react-webcam';
-import * as tf from '@tensorflow/tfjs';
-import * as cocossd from '@tensorflow-models/coco-ssd';
-import { Box, Typography, CircularProgress } from '@mui/material';
-
-interface Detection {
-  bbox: [number, number, number, number];
-  class: string;
-  score: number;
-}
+import { Box, Typography, CircularProgress, Card, Alert } from '@mui/material';
+import { drawRect } from '../../utils/computer-vision/drawRect';
+import { useDetectObjects } from '../../utils/computer-vision/useDetectObjects';
 
 const ObjectDetectionCamera = () => {
-  const webcamRef = useRef<Webcam>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  
-  const [model, setModel] = useState<cocossd.ObjectDetection | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
+  // Use our custom detection hook
+  const {
+    webcamRef,
+    canvasRef,
+    loading,
+    error,
+    stats,
+    isRunning
+  } = useDetectObjects({
+    interval: 1000,
+    enableLogging: true,
+    drawBoxes: false // Disable drawing boxes
+  });
 
-  // Load the COCO-SSD model
-  useEffect(() => {
-    const loadModel = async () => {
-      try {
-        await tf.ready();
-        const loadedModel = await cocossd.load();
-        setModel(loadedModel);
-        setLoading(false);
-      } catch (err) {
-        console.error('Failed to load model:', err);
-        setError('Failed to load detection model');
-        setLoading(false);
-      }
-    };
-
-    loadModel();
-  }, []);
-
-  // Detect objects in the webcam feed
-  useEffect(() => {
-    if (!model || loading) return;
-
-    const detectInterval = setInterval(() => {
-      detect();
-    }, 100); // Run detection every 100ms
-
-    return () => clearInterval(detectInterval);
-  }, [model, loading]);
-
-  const detect = async () => {
-    // Check if webcam and canvas are ready
-    if (
-      webcamRef.current && 
-      webcamRef.current.video && 
-      webcamRef.current.video.readyState === 4 &&
-      canvasRef.current
-    ) {
-      const video = webcamRef.current.video;
-      const canvas = canvasRef.current;
-      
-      // Set canvas dimensions to match video
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      
-      // Detect objects
-      const detections = await model!.detect(video);
-      
-      // Clear the canvas
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw bounding boxes for detected objects
-      detections.forEach((detection: Detection) => {
-        const [x, y, width, height] = detection.bbox;
-        
-        // Draw rectangle
-        ctx.strokeStyle = '#00FF00';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x, y, width, height);
-        
-        // Draw background for label
-        ctx.fillStyle = '#00FF00';
-        ctx.fillRect(x, y - 20, width, 20);
-        
-        // Draw label text
-        ctx.fillStyle = '#000000';
-        ctx.font = '16px Arial';
-        ctx.fillText(
-          `${detection.class} ${Math.round(detection.score * 100)}%`,
-          x, 
-          y - 5
-        );
-      });
-    }
-  };
+  // Check if multiple people are detected
+  const hasMultiplePeople = (stats.persons > 1) || (stats.faces > 1);
+  const hasNoFace = stats.persons === 0 && stats.faces === 0;
 
   return (
     <Box 
@@ -105,6 +32,46 @@ const ObjectDetectionCamera = () => {
         margin: '0 auto'
       }}
     >
+      {/* Status alerts */}
+      {hasMultiplePeople && (
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 2, 
+            fontWeight: 'bold', 
+            '& .MuiAlert-icon': { fontSize: '1.5rem' } 
+          }}
+        >
+          Multiple people detected - Only one person allowed!
+        </Alert>
+      )}
+      
+      {!loading && !error && !hasMultiplePeople && !hasNoFace && (
+        <Alert 
+          severity="success" 
+          sx={{ 
+            mb: 2, 
+            fontWeight: 'bold', 
+            '& .MuiAlert-icon': { fontSize: '1.5rem' } 
+          }}
+        >
+          Single person detected - Authorized ✓
+        </Alert>
+      )}
+      
+      {!loading && !error && hasNoFace && (
+        <Alert 
+          severity="warning" 
+          sx={{ 
+            mb: 2, 
+            fontWeight: 'bold', 
+            '& .MuiAlert-icon': { fontSize: '1.5rem' }
+          }}
+        >
+          No person detected - Please position yourself in the frame
+        </Alert>
+      )}
+
       {loading ? (
         <Box 
           sx={{ 
@@ -118,7 +85,7 @@ const ObjectDetectionCamera = () => {
         >
           <CircularProgress />
           <Typography variant="body1" sx={{ ml: 2 }}>
-            Loading object detection model...
+            Loading object detection models...
           </Typography>
         </Box>
       ) : error ? (
@@ -136,10 +103,31 @@ const ObjectDetectionCamera = () => {
           <Typography variant="body1">{error}</Typography>
         </Box>
       ) : (
-        <>
+        <Card variant="outlined" sx={{ 
+          position: 'relative', 
+          overflow: 'hidden',
+          border: hasMultiplePeople ? '3px solid #ff0000' : '1px solid rgba(0,0,0,0.12)'
+        }}>
+          {/* Status indicator */}
+          <Box 
+            sx={{ 
+              position: 'absolute', 
+              top: 10, 
+              left: 10, 
+              zIndex: 20, 
+              backgroundColor: isRunning ? 'rgba(0, 200, 0, 0.7)' : 'rgba(255, 0, 0, 0.7)', 
+              borderRadius: '50%',
+              width: '12px',
+              height: '12px',
+              boxShadow: '0 0 8px white',
+              border: '1px solid white'
+            }} 
+          />
+          
           <Webcam
             ref={webcamRef}
             muted={true}
+            mirrored={false}
             style={{
               width: '100%',
               height: 'auto',
@@ -154,10 +142,100 @@ const ObjectDetectionCamera = () => {
               left: 0,
               width: '100%',
               height: '100%',
-              zIndex: 10
+              zIndex: 10,
+              pointerEvents: 'none',
+              mixBlendMode: 'normal', // Try 'multiply' if detection boxes aren't visible
+              opacity: 1.0,
+              border: '1px solid transparent' // Ensures canvas is visible for debugging
             }}
           />
-        </>
+          
+          {/* Multiple people warning overlay */}
+          {hasMultiplePeople && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(255, 0, 0, 0.15)',
+                zIndex: 9,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                pointerEvents: 'none'
+              }}
+            >
+              <Typography
+                variant="h4"
+                sx={{
+                  color: 'white',
+                  textShadow: '0 0 10px rgba(0,0,0,0.8)',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  transform: 'rotate(-15deg)',
+                  backgroundColor: 'rgba(255,0,0,0.7)',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  border: '2px solid white'
+                }}
+              >
+                MULTIPLE PEOPLE DETECTED
+              </Typography>
+            </Box>
+          )}
+          
+          {/* Stats display with better visibility */}
+          <Box sx={{ 
+            position: 'absolute', 
+            bottom: 10, 
+            right: 10, 
+            background: 'rgba(0,0,0,0.7)', 
+            p: 1.5, 
+            borderRadius: 2, 
+            color: 'white',
+            border: '1px solid rgba(255,255,255,0.3)',
+            boxShadow: '0 0 10px rgba(0,0,0,0.5)',
+            zIndex: 15
+          }}>
+            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 0.5 }}>
+              Detection Status
+            </Typography>
+            <Typography variant="caption" component="div" sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              color: stats.persons > 1 ? '#ff8c8c' : 'inherit',
+              fontWeight: stats.persons > 1 ? 'bold' : 'normal'
+            }}>
+              <span>Persons:</span> <strong>{stats.persons}</strong>
+            </Typography>
+            <Typography variant="caption" component="div" sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              color: stats.faces > 1 ? '#ff8c8c' : 'inherit',
+              fontWeight: stats.faces > 1 ? 'bold' : 'normal'
+            }}>
+              <span>Faces:</span> <strong>{stats.faces}</strong>
+            </Typography>
+            <Typography variant="caption" component="div" sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              color: stats.cellPhones > 0 ? '#ff8c8c' : 'inherit',
+              fontWeight: stats.cellPhones > 0 ? 'bold' : 'normal'
+            }}>
+              <span>Cell Phones:</span> <strong>{stats.cellPhones}</strong>
+            </Typography>
+            <Typography variant="caption" component="div" sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              color: stats.books > 0 ? '#ff8c8c' : 'inherit',
+              fontWeight: stats.books > 0 ? 'bold' : 'normal'
+            }}>
+              <span>Books:</span> <strong>{stats.books}</strong>
+            </Typography>
+          </Box>
+        </Card>
       )}
     </Box>
   );

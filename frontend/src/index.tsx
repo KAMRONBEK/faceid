@@ -11,9 +11,7 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 
 root.render(
-  <React.StrictMode>
-    <Suspense fallback={<div>Loading...</div>}>
-      <App />
-    </Suspense>
-  </React.StrictMode>
+  <Suspense fallback={<div>Loading...</div>}>
+    <App />
+  </Suspense>
 ); 
