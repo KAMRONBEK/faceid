@@ -2,7 +2,8 @@ import React, { lazy } from 'react';
 import { Navigate, Route, createBrowserRouter, createRoutesFromElements } from 'react-router-dom';
 import Loadable from '../layouts/full/shared/loadable/Loadable';
 import { useSelector } from 'react-redux';
-import ErrorBoundary from '../components/container/ErrorBoundary';
+import ErrorBoundary from '@/components/container/ErrorBoundary';
+// import ErrorBoundary from '../components/container/ErrorBoundary';
 
 /* ***Layouts**** */
 const BlankLayout = Loadable(lazy(() => import('../layouts/blank/BlankLayout')));
@@ -44,11 +45,14 @@ const isDevelopment = (import.meta.env.MODE === 'development') as boolean;
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
-    // Every router we create will now go in here as
-    // they going to be child of our main App component
+    // Removed root level error boundary
     <>
       {/* // Private Routes */}
-      <Route path="" element={<PrivateRoute />}>
+      <Route 
+        path="" 
+        element={<PrivateRoute />}
+        errorElement={<ErrorBoundary showDetails={isDevelopment} />}
+      >
         {/* // Main layout */}
         <Route path="/" element={<FullLayout />}>
           <Route index={true} path="/" element={<Navigate to="/dashboard" />} />
@@ -71,23 +75,24 @@ const Router = createBrowserRouter(
         </Route>
       </Route>
       {/* User layout */}
-      <Route path="/user" element={<FullLayout />}>
+      <Route path="/user" element={<FullLayout />} 
+       errorElement={<ErrorBoundary showDetails={isDevelopment} />}>
         <Route path="account" element={<UserAccount />} />
       </Route>
 
       {/* Authentication layout */}
-      <Route path="/auth" element={<BlankLayout />}>
+      <Route 
+        path="/auth" 
+        element={<BlankLayout />}
+        errorElement={<ErrorBoundary showDetails={isDevelopment} />}
+      >
         <Route path="404" element={<Error />} />
         <Route path="register" element={<Register />} />
-        <Route path="login" element={
-          <ErrorBoundary showDetails={isDevelopment}>
-            <Login />
-          </ErrorBoundary>
-        } />
+        <Route path="login" element={<Login />} />
         <Route path="*" element={<Navigate to="/auth/404" />} />
       </Route>
       <Route path="*" element={<Navigate to="/auth/404" />} />
-    </>,
+    </>
   ),
   { basename: publicUrl } // Add basename configuration
 );

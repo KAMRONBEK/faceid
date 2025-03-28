@@ -4,7 +4,7 @@ import { Typography, Button, Box, Container, Paper } from '@mui/material';
 
 // Define the props and state interfaces using type instead of interface
 export type ErrorBoundaryProps = {
-  children: ReactNode;
+  children?: ReactNode; // Make children optional
   showDetails?: boolean;
 };
 
@@ -36,7 +36,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
    */
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     // Update state so the next render will show the fallback UI
-    return { hasError: true };
+    return { hasError: true, error };
   };
 
   /**
@@ -115,7 +115,8 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       );
     }
 
-    return this.props.children;
+    // Return children if provided, otherwise return null
+    return this.props.children || null;
   }
 }
 
