@@ -10,6 +10,12 @@ const SidebarItems = () => {
   const { userInfo } = useAppSelector((state) => state.auth);
   const { pathname } = useLocation();
   const pathDirect = pathname;
+  
+  // Check if user is a teacher
+  const isTeacher = userInfo?.role === 'teacher';
+
+  console.log("SidebarItems - userInfo:", userInfo);
+  console.log("SidebarItems - isTeacher:", isTeacher);
 
   return (
     <Box sx={{ px: 3 }}>
@@ -17,7 +23,7 @@ const SidebarItems = () => {
         {Menuitems.map((item) => {
           // Check if the user is a student and if the item should be hidden
           if (
-            userInfo?.user && !userInfo.user.isTeacher &&
+            !isTeacher &&
             ['Create Exam', 'Add Questions', 'Exam Logs'].includes(item.title || '')
           ) {
             return null; // Don't render this menu item for students
@@ -25,7 +31,7 @@ const SidebarItems = () => {
           // {/********SubHeader**********/}
           if (item.subheader) {
             // Check if the user is a student and if the subheader should be hidden
-            if (userInfo?.user && !userInfo.user.isTeacher && item.subheader === 'Teacher') {
+            if (!isTeacher && item.subheader === 'Teacher') {
               return null; // Don't render the "Teacher" subheader for students
             }
 

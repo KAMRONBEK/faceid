@@ -27,7 +27,8 @@ const authSlice = createSlice({
     // Set userinfo in local storage
     setCredentials: (state, action: PayloadAction<UserInfo>) => {
       state.userInfo = action.payload;
-      console.log("Setting credentials with payload:", action.payload);
+      console.log("Setting credentials with data:", action.payload);
+      
       // Ensure localStorage is updated synchronously
       try {
         localStorage.setItem('userInfo', JSON.stringify(action.payload));

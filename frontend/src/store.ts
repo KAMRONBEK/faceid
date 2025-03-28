@@ -6,14 +6,14 @@ import { apiSlice } from './slices/apiSlice';
 export interface AppStore {
   auth: {
     userInfo: {
-      token?: string;
-      user?: {
-        _id: string;
-        name: string;
-        email: string;
-        isAdmin: boolean;
-        isTeacher: boolean;
-      }
+      _id: string;
+      name: string;
+      email: string;
+      role: string;
+      token: string;
+      message?: string;
+      createdAt?: string;
+      updatedAt?: string;
     } | null;
   };
   [key: string]: any; // To accommodate the dynamically added apiSlice reducer

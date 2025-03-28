@@ -9,9 +9,16 @@ export interface User {
   updatedAt: string;
 }
 
+// New UserInfo interface that matches the backend response
 export interface UserInfo {
-  user: User;
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
   token: string;
+  message?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LoginCredentials {
