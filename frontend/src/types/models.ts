@@ -17,6 +17,7 @@ export interface UserInfo {
   role: string;
   token: string;
   message?: string;
+  faceEmbedding?: number[]; // Face embedding for student users
   createdAt?: string;
   updatedAt?: string;
 }

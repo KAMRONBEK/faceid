@@ -9,9 +9,11 @@ import {
 import { protect } from "../middleware/authMiddleware.js";
 import { saveCheatingLog, getCheatingLogsByExamId } from "../controllers/cheatingLogController.js";
 const userRoutes = express.Router();
-userRoutes.post("/", registerUser); // Faqat shuni qoldiring
+
+userRoutes.post("/", registerUser);
 userRoutes.post("/auth", authUser);
 userRoutes.post("/logout", logoutUser);
+
 // protecting profile route using auth middleware protect
 userRoutes
   .route("/profile")

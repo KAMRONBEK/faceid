@@ -8,15 +8,23 @@ const authUser = asyncHandler(async (req, res) => {
 
   if (user && (await user.matchPassword(password))) {
     const token = generateToken(res, user._id); // Tokenni olish
-    
-    res.status(200).json({
+
+    // Create response object
+    const response = {
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
       token: token, // Responsega tokenni qo'shish
       message: "User Successfully login with role: " + user.role,
-    });
+    };
+
+    // Include face embedding if it exists
+    if (user.faceEmbedding) {
+      response.faceEmbedding = user.faceEmbedding;
+    }
+
+    res.status(200).json(response);
   } else {
     res.status(401);
     throw new Error("Invalid User email or password");
@@ -24,7 +32,7 @@ const authUser = asyncHandler(async (req, res) => {
 });
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, faceEmbedding } = req.body;
 
   const userExist = await User.findOne({ email });
 
@@ -33,19 +41,46 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("User Already Exists");
   }
 
-  const user = await User.create({ name, email, password, role });
+  // Validate face embedding for students
+  if (role === 'student' && !faceEmbedding) {
+    res.status(400);
+    throw new Error("Face embedding is required for student registration");
+  }
+
+  // Create user with the provided data
+  const userData = {
+    name,
+    email,
+    password,
+    role
+  };
+
+  // Add face embedding for students
+  if (role === 'student') {
+    userData.faceEmbedding = faceEmbedding;
+  }
+
+  const user = await User.create(userData);
 
   if (user) {
     const token = generateToken(res, user._id); // Tokenni olish
-    
-    res.status(201).json({
+
+    // Create response object
+    const response = {
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
       token: token, // Responsega tokenni qo'shish
       message: "User Successfully created with role: " + user.role,
-    });
+    };
+
+    // Include face embedding if it exists
+    if (user.faceEmbedding) {
+      response.faceEmbedding = user.faceEmbedding;
+    }
+
+    res.status(201).json(response);
   } else {
     res.status(400);
     throw new Error("Invalid User Data");
@@ -61,13 +96,27 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const getUserProfile = asyncHandler(async (req, res) => {
-  const user = {
-    _id: req.user._id,
-    name: req.user.name,
-    email: req.user.email,
-    role: req.user.role,
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Create response object with user data
+  const response = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
   };
-  res.status(200).json(user);
+
+  // Include face embedding if it exists
+  if (user.faceEmbedding) {
+    response.faceEmbedding = user.faceEmbedding;
+  }
+
+  res.status(200).json(response);
 });
 
 const updateUserProfile = asyncHandler(async (req, res) => {
@@ -78,26 +127,59 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     user.email = req.body.email || user.email;
     user.role = req.body.role || user.role;
 
+    // Update face embedding if provided
+    if (req.body.faceEmbedding) {
+      user.faceEmbedding = req.body.faceEmbedding;
+    }
+
     if (req.body.password) {
       user.password = req.body.password;
     }
 
     const updatedUser = await user.save();
-    res.status(200).json({
+
+    // Create response object with updated user data
+    const response = {
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
       role: updatedUser.role,
-    });
+    };
+
+    // Include face embedding if it exists
+    if (updatedUser.faceEmbedding) {
+      response.faceEmbedding = updatedUser.faceEmbedding;
+    }
+
+    res.status(200).json(response);
   } else {
     res.status(404);
     throw new Error("User Not Found");
   }
 });
+
+// Get user's face embedding
+const getUserFaceEmbedding = asyncHandler(async (req, res) => {
+  // If userId is provided, use it; otherwise use the authenticated user's ID
+  const userId = req.params.userId || req.user._id;
+
+  const user = await User.findById(userId).select('faceEmbedding');
+
+  if (user && user.faceEmbedding) {
+    res.json({
+      faceEmbedding: user.faceEmbedding
+    });
+  } else {
+    res.status(404);
+    throw new Error("Face embedding not found");
+  }
+});
+
 export {
   authUser,
   registerUser,
   logoutUser,
   getUserProfile,
   updateUserProfile,
+  getUserFaceEmbedding
 };

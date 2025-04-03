@@ -23,6 +23,13 @@ const userSchema = mongoose.Schema(
       enum: ['student', 'teacher', 'admin'], // Role turlarini cheklash
       default: 'student'
     },
+    // Face embedding for student authentication - store only the embedding vector, not the image
+    faceEmbedding: {
+      type: Array, // Store as array of numbers
+      required: function () {
+        return this.role === 'student'; // Only required for students
+      }
+    }
   },
   {
     timestamps: true,

@@ -17,7 +17,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    //Register Mutation Api
+    //Register Mutation Api (includes face embedding for students)
     register: builder.mutation({
       query: (data) => ({
         url: `${USERS_URL}`,
@@ -39,11 +39,23 @@ export const userApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    // Get user profile (includes face embedding)
+    getUserProfile: builder.query({
+      query: () => ({
+        url: `${USERS_URL}/profile`,
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
 // it specify convention to export them
 // like for mutation we have to add use + name + Mutation
 // like for query we have to add use + name + query
-export const { useLoginMutation, useLogoutMutation, useRegisterMutation, useUpdateUserMutation } =
-  userApiSlice;
+export const { 
+  useLoginMutation, 
+  useLogoutMutation, 
+  useRegisterMutation, 
+  useUpdateUserMutation,
+  useGetUserProfileQuery
+} = userApiSlice;
