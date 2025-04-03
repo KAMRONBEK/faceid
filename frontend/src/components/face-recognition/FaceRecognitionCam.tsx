@@ -24,6 +24,12 @@ const FaceRecognitionCam: React.FC<FaceRecognitionCamProps> = ({
     // Use external webcam ref if provided, otherwise use internal one
     const webcamRef = externalWebcamRef || internalWebcamRef;
 
+    // For debugging
+    useEffect(() => {
+        console.log('FaceRecognitionCam using webcam ref:', webcamRef?.current);
+        console.log('External webcam ref provided:', !!externalWebcamRef);
+    }, [webcamRef?.current, externalWebcamRef]);
+
     // Get user info from Redux store
     const { userInfo } = useSelector((state: RootState) => state.auth);
 
@@ -59,7 +65,7 @@ const FaceRecognitionCam: React.FC<FaceRecognitionCamProps> = ({
         if (
             !loading &&
             detector &&
-            webcamRef.current &&
+            webcamRef?.current &&
             userInfo?.faceEmbedding &&
             !intervalRef.current
         ) {
@@ -76,16 +82,20 @@ const FaceRecognitionCam: React.FC<FaceRecognitionCamProps> = ({
                 intervalRef.current = null;
             }
         };
-    }, [loading, detector, userInfo?.faceEmbedding, interval, webcamRef]);
+    }, [loading, detector, userInfo?.faceEmbedding, interval, webcamRef?.current]);
 
     // Function to check similarity between webcam face and stored embedding
     const checkSimilarity = async () => {
-        if (!webcamRef.current || !userInfo?.faceEmbedding) return;
+        if (!webcamRef?.current || !userInfo?.faceEmbedding) {
+            console.log('Missing webcam ref or face embedding for comparison');
+            return;
+        }
 
         try {
             // Get current image from webcam
             const imageSrc = webcamRef.current.getScreenshot();
             if (!imageSrc) {
+                console.log('No screenshot available from webcam');
                 setSimilarity(null);
                 return;
             }
@@ -128,24 +138,28 @@ const FaceRecognitionCam: React.FC<FaceRecognitionCamProps> = ({
                 </Alert>
             ) : (
                 <Box sx={{ position: 'relative' }}>
-                    {/* Only render webcam if we're not using an external one */}
+                    {/* Only render our own webcam if we're not using an external one */}
                     {!externalWebcamRef && (
                         <Webcam
                             audio={false}
                             ref={internalWebcamRef}
+                            muted={true}
+                            mirrored={false}
                             screenshotFormat="image/jpeg"
                             videoConstraints={{
                                 width: 640,
                                 height: 480,
-                                facingMode: 'user'
+                                facingMode: "user"
                             }}
                             style={{
                                 width: '100%',
-                                borderRadius: '8px'
+                                height: 'auto',
+                                borderRadius: '4px'
                             }}
                         />
                     )}
 
+                    {/* Always show the similarity indicator */}
                     <Paper
                         elevation={3}
                         sx={{
