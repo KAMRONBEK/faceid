@@ -117,9 +117,9 @@ const FaceRecognitionCam: React.FC<FaceRecognitionCamProps> = ({
 
     // Function to get color based on similarity score
     const getSimilarityColor = (score: number) => {
-        if (score >= 75) return 'success.main';
-        if (score >= 60) return 'warning.main';
-        return 'error.main';
+        if (score >= 85) return 'success.main'; // Highly likely same person
+        if (score >= 70) return 'warning.main'; // Potentially same person but needs verification 
+        return 'error.main';                    // Likely different person
     };
 
     return (
@@ -166,24 +166,39 @@ const FaceRecognitionCam: React.FC<FaceRecognitionCamProps> = ({
                             position: 'absolute',
                             bottom: 16,
                             right: 16,
-                            padding: '8px 12px',
+                            padding: '8px 16px',
                             borderRadius: '20px',
                             backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                            minWidth: 100,
+                            minWidth: 120,
                             textAlign: 'center',
                             zIndex: 20
                         }}
                     >
                         {similarity !== null ? (
-                            <Typography
-                                variant="h6"
-                                sx={{
-                                    color: getSimilarityColor(similarity),
-                                    fontWeight: 'bold'
-                                }}
-                            >
-                                {Math.round(similarity)}%
-                            </Typography>
+                            <Box>
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        color: getSimilarityColor(similarity),
+                                        fontWeight: 'bold',
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    {Math.round(similarity)}%
+                                </Typography>
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        color: 'white',
+                                        display: 'block',
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    {similarity >= 85 ? 'Identity Match' :
+                                        similarity >= 70 ? 'Verify Identity' :
+                                            'Identity Mismatch'}
+                                </Typography>
+                            </Box>
                         ) : (
                             <Typography variant="body2" sx={{ color: 'grey.400' }}>
                                 No face detected

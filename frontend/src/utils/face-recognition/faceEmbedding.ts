@@ -84,6 +84,7 @@ export async function generateFaceEmbedding(imgData: string): Promise<Float32Arr
 
 /**
  * Calculates cosine similarity between two embeddings
+ * with improved scaling to create better separation between matched and unmatched faces
  */
 export function calculateSimilarity(embedding1: Float32Array, embedding2: Float32Array): number {
   // Ensure embeddings are of same length
@@ -107,9 +108,29 @@ export function calculateSimilarity(embedding1: Float32Array, embedding2: Float3
   
   if (mag1 === 0 || mag2 === 0) return 0;
   
-  // Cosine similarity, convert to percentage (0-100)
-  const similarity = (dotProduct / (mag1 * mag2));
-  return (similarity + 1) * 50; // Convert from [-1,1] to [0,100]
+  // Raw cosine similarity in [-1,1] range
+  const rawSimilarity = dotProduct / (mag1 * mag2);
+  
+  // Apply a non-linear transformation to increase separation:
+  // - Values below 0.8 (raw similarity) drop more rapidly
+  // - Values above 0.8 are stretched to fill the upper range
+  // This creates better separation between authorized users and others
+  
+  // Convert raw similarity from [-1,1] to [0,1]
+  const normalizedSimilarity = (rawSimilarity + 1) / 2;
+  
+  // Apply a power function to create more separation
+  // Higher exponents create more separation but might be too aggressive
+  const power = 4; // Increase this value to create sharper separation
+  
+  // Apply non-linear transformation and scale to percentage
+  if (normalizedSimilarity >= 0.8) {
+    // Stretch the upper range [0.8, 1.0] to [70, 100]
+    return 70 + ((normalizedSimilarity - 0.8) / 0.2) * 30;
+  } else {
+    // Apply stronger drop-off to lower similarities
+    return Math.pow(normalizedSimilarity / 0.8, power) * 70;
+  }
 }
 
 /**
