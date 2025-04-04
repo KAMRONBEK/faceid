@@ -21,7 +21,6 @@ export const detectObjects = async (
   const result: DetectionResult = {
     relevantObjects: [],
     stats: {
-      persons: 0,
       cellPhones: 0,
       books: 0,
       faces: 0

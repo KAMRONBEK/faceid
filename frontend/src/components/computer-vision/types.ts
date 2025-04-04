@@ -56,7 +56,6 @@ export interface FaceDetection {
 export interface DetectionResult {
   relevantObjects: Detection[];
   stats: {
-    persons: number;
     cellPhones: number;
     books: number;
     faces: number;

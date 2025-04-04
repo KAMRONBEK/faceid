@@ -4,6 +4,7 @@ import { Box, Typography, CircularProgress, Card, Alert } from '@mui/material';
 import swal from 'sweetalert';
 import { useDetectObjects } from '../../../utils/computer-vision/useDetectObjects';
 import FaceRecognitionCam from '../../../components/face-recognition/FaceRecognitionCam';
+import { AlertColor } from '@mui/material';
 
 interface WebCamProps {
   onCheatingDetected?: (event: { type: string; timestamp: string }) => void;
@@ -64,9 +65,9 @@ export default function WebCam({
     }
   });
 
-  // Check if multiple people are detected
-  const hasMultiplePeople = (stats.persons > 1) || (stats.faces > 1);
-  const hasNoFace = stats.persons === 0 && stats.faces === 0;
+  // Check if multiple people are detected (based only on faces)
+  const hasMultiplePeople = stats.faces > 1;
+  const hasNoFace = stats.faces === 0;
 
   // Function to report cheating to the parent component
   const reportCheating = (type: string) => {
@@ -111,7 +112,7 @@ export default function WebCam({
             '& .MuiAlert-icon': { fontSize: '1.5rem' }
           }}
         >
-          Multiple people detected - Only one person allowed!
+          Multiple faces detected - Only one person allowed!
         </Alert>
       )}
 
@@ -124,7 +125,7 @@ export default function WebCam({
             '& .MuiAlert-icon': { fontSize: '1.5rem' }
           }}
         >
-          No person detected - Please position yourself in the frame
+          No face detected - Please position yourself in the frame
         </Alert>
       )}
 
@@ -273,14 +274,6 @@ export default function WebCam({
             }}>
               <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 0.5 }}>
                 Detection Status
-              </Typography>
-              <Typography variant="caption" component="div" sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                color: stats.persons > 1 ? '#ff8c8c' : 'inherit',
-                fontWeight: stats.persons > 1 ? 'bold' : 'normal'
-              }}>
-                <span>Persons:</span> <strong>{stats.persons}</strong>
               </Typography>
               <Typography variant="caption" component="div" sx={{
                 display: 'flex',

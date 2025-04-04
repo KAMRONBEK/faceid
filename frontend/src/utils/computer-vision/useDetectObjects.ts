@@ -6,7 +6,6 @@ import { detectObjects } from './detection';
 import { drawRect } from './drawRect';
 
 interface DetectionStats {
-  persons: number;
   cellPhones: number;
   books: number;
   faces: number;
@@ -92,7 +91,6 @@ export const useDetectObjects = (options: DetectionHookOptions = {}): DetectionH
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [detectionResults, setDetectionResults] = useState<Detection[]>([]);
   const [stats, setStats] = useState<DetectionStats>({
-    persons: 0,
     cellPhones: 0,
     books: 0,
     faces: 0
