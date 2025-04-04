@@ -6,6 +6,7 @@ import {
   IconUserPlus,
   IconClipboardList,
   IconCamera,
+  IconFaceId,
 } from '@tabler/icons-react';
 
 import { uniqueId } from 'lodash';
@@ -69,6 +70,12 @@ const Menuitems = [
     title: 'Object Detection',
     icon: IconCamera,
     href: '/object-detection',
+  },
+  {
+    id: uniqueId(),
+    title: 'Test Similarity',
+    icon: IconFaceId,
+    href: '/test-similarity',
   },
   // {
   //   id: uniqueId(),

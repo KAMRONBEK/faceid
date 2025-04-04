@@ -144,9 +144,15 @@ export async function extractFaceAndGenerateEmbedding(imgData: string): Promise<
     // Load face detection model
     const detector = await loadFaceDetectionModel();
     
+    // Create the proper image URL format if it's just the base64 string
+    const imageDataUrl = imgData.startsWith('data:') ? imgData : `data:image/jpeg;base64,${imgData}`;
+    
+    // Resize image if needed before processing
+    const resizedImgData = await resizeImageIfNeeded(imageDataUrl);
+    
     // Detect faces
     const img = new Image();
-    img.src = imgData;
+    img.src = resizedImgData;
     
     // Wait for image to load
     await new Promise((resolve) => {
@@ -196,6 +202,62 @@ export async function extractFaceAndGenerateEmbedding(imgData: string): Promise<
     console.error('Error processing face:', error);
     throw error;
   }
+}
+
+/**
+ * Resizes an image if its dimensions exceed maximum allowed size
+ * to prevent memory and performance issues
+ */
+async function resizeImageIfNeeded(imgDataUrl: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      // Check if resizing is needed
+      const MAX_DIMENSION = 1200; // Maximum width or height
+      
+      if (img.width <= MAX_DIMENSION && img.height <= MAX_DIMENSION) {
+        // No resizing needed
+        resolve(imgDataUrl);
+        return;
+      }
+      
+      // Calculate new dimensions while maintaining aspect ratio
+      let width = img.width;
+      let height = img.height;
+      
+      if (width > height) {
+        height = (height * MAX_DIMENSION) / width;
+        width = MAX_DIMENSION;
+      } else {
+        width = (width * MAX_DIMENSION) / height;
+        height = MAX_DIMENSION;
+      }
+      
+      // Create canvas for resizing
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Draw resized image
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
+      
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      // Get resized image as data URL
+      const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      resolve(resizedDataUrl);
+    };
+    
+    img.onerror = () => {
+      reject(new Error('Failed to load image for resizing'));
+    };
+    
+    img.src = imgDataUrl;
+  });
 }
 
 /**

@@ -38,6 +38,9 @@ const TeacherRoute = Loadable(lazy(() => import('../views/authentication/Teacher
 // Computer Vision Routes
 const ObjectDetectionScreen = Loadable(lazy(() => import('../components/computer-vision/ObjectDetectionScreen')));
 
+// Utility Routes
+const TestSimilarity = Loadable(lazy(() => import('../pages/test-similarity')));
+
 // Public URL path from environment or empty string
 const publicUrl = import.meta.env.BASE_URL || '' as string;
 const isDevelopment = (import.meta.env.MODE === 'development') as boolean;
@@ -47,8 +50,8 @@ const Router = createBrowserRouter(
     // Removed root level error boundary
     <>
       {/* // Private Routes */}
-      <Route 
-        path="" 
+      <Route
+        path=""
         element={<PrivateRoute />}
         errorElement={<ErrorBoundary showDetails={isDevelopment} />}
       >
@@ -62,6 +65,7 @@ const Router = createBrowserRouter(
           <Route path="/result" element={<ResultPage />} />
           <Route path="/exam-results/:examId" element={<ResultPage />} />
           <Route path="/object-detection" element={<ObjectDetectionScreen />} />
+          <Route path="/test-similarity" element={<TestSimilarity />} />
           <Route path="" element={<TeacherRoute />}>
             <Route path="/create-exam" element={<CreateExamPage />} />
             <Route path="/add-questions" element={<AddQuestions />} />
@@ -74,14 +78,14 @@ const Router = createBrowserRouter(
         </Route>
       </Route>
       {/* User layout */}
-      <Route path="/user" element={<FullLayout />} 
-       errorElement={<ErrorBoundary showDetails={isDevelopment} />}>
+      <Route path="/user" element={<FullLayout />}
+        errorElement={<ErrorBoundary showDetails={isDevelopment} />}>
         <Route path="account" element={<UserAccount />} />
       </Route>
 
       {/* Authentication layout */}
-      <Route 
-        path="/auth" 
+      <Route
+        path="/auth"
         element={<BlankLayout />}
         errorElement={<ErrorBoundary showDetails={isDevelopment} />}
       >
@@ -90,6 +94,16 @@ const Router = createBrowserRouter(
         <Route path="login" element={<Login />} />
         <Route path="*" element={<Navigate to="/auth/404" />} />
       </Route>
+
+      {/* Public utilities (no auth required) */}
+      <Route
+        path="/tools"
+        element={<BlankLayout />}
+        errorElement={<ErrorBoundary showDetails={isDevelopment} />}
+      >
+        <Route path="face-similarity" element={<TestSimilarity />} />
+      </Route>
+
       <Route path="*" element={<Navigate to="/auth/404" />} />
     </>
   ),
